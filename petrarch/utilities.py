@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
-##	utilities.py [module]
+# utilities.py [module]
 ##
 # Utilities for the PETRARCH event data coder
 ##
 # SYSTEM REQUIREMENTS
-# This program has been successfully run under Mac OS 10.10; it is standard Python 2.7
-# so it should also run in Unix or Windows.
+# This program has been successfully run under Mac OS 10.10; it is standard
+# Python 2.7 so it should also run in Unix or Windows.
 #
 # INITIAL PROVENANCE:
 # Programmer:
 #             John Beieler
-#			  Caerus Associates/Penn State University
-#			  Washington, DC / State College, PA, 16801 U.S.A.
-#			  http://caerusassociates.com
+#             Caerus Associates/Penn State University
+#             Washington, DC / State College, PA, 16801 U.S.A.
+#             http://caerusassociates.com
 #             http://bdss.psu.edu
 #
 # GitHub repository: https://github.com/openeventdata/petrarch
@@ -44,7 +44,7 @@ from collections import defaultdict, Counter
 
 def stanford_parse(event_dict):
     logger = logging.getLogger('petr_log')
-    #What is dead can never die...
+    # What is dead can never die...
     print("\nSetting up StanfordNLP. The program isn't dead. Promise.")
     logger.info('Setting up StanfordNLP')
     core = corenlp.StanfordCoreNLP(PETRglobals.stanfordnlp,
@@ -71,7 +71,7 @@ def stanford_parse(event_dict):
                     if 'coref' in stanford_result:
                         sent_dict['coref'] = stanford_result['coref']
 
-                    #TODO: To go backwards you'd do str.replace(' ) ', ')')
+                    # TODO: To go backwards you'd do str.replace(' ) ', ')')
                     sent_dict['parsed'] = _format_parsed_str(s_parsetree)
                 except Exception as e:
                     print('Something went wrong. ¯\_(ツ)_/¯. See log file.')
@@ -118,9 +118,9 @@ def story_filter(story_dict, story_id):
                     if event[0][0] != '-' and event[1][0] != '-':
                         alist = [story_date]
     #                    print('@@@',alist.extend(event))
-                        print('@@@',alist,event)
+                        print('@@@', alist, event)
                         alist.extend(event)
-                        print('@@@',alist)
+                        print('@@@', alist)
                         event_tuple = tuple(alist)
                         filtered[event_tuple]
                         if 'issues' in sent_dict:
@@ -129,8 +129,8 @@ def story_filter(story_dict, story_id):
                             for issue in issues:
                                 filtered[event_tuple]['issues'][issue[0]] += issue[1]
 
-                        #Will keep track of this info, but not necessarily write it
-                        #out
+                        # Will keep track of this info, but not necessarily
+                        # write it out
                         filtered[event_tuple]['ids'] = []
                         filtered[event_tuple]['ids'].append(sent_id)
                 except IndexError:

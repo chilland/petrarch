@@ -1,19 +1,20 @@
 # SYSTEM REQUIREMENTS
-# This program has been successfully run under Mac OS 10.10; it is standard Python 2.7
-# so it should also run in Unix or Windows.
+# This program has been successfully run under Mac OS 10.10; it is standard
+# Python 2.7 so it should also run in Unix or Windows.
 #
 # INITIAL PROVENANCE:
 # Programmer: Philip A. Schrodt
-#			  Parus Analytics
-#			  Charlottesville, VA, 22901 U.S.A.
-#			  http://eventdata.parusanalytics.com
+#             Parus Analytics
+#             Charlottesville, VA, 22901 U.S.A.
+#             http://eventdata.parusanalytics.com
 #
 # GitHub repository: https://github.com/openeventdata/petrarch
 #
 # Copyright (c) 2014	Philip A. Schrodt.	All rights reserved.
 #
-# This project is part of the Open Event Data Alliance tool set; earlier developments 
-# were funded in part by National Science Foundation grant SES-1259190
+# This project is part of the Open Event Data Alliance tool set; earlier
+# developments were funded in part by National Science Foundation grant
+# SES-1259190
 #
 # This code is covered under the MIT license
 #
@@ -99,7 +100,7 @@ def write_events(event_dict, output_file):
         story_events = '\n'.join(story_output)
         event_output.append(story_events)
 
-    #Filter out blank lines
+    # Filter out blank lines
     event_output = [event for event in event_output if event]
     final_event_str = '\n'.join(event_output)
     with open(output_file, 'w') as f:
