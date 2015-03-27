@@ -5,21 +5,22 @@
 # CODE REPOSITORY: https://github.com/eventdata/PETRARCH
 ##
 # SYSTEM REQUIREMENTS
-# This program has been successfully run under Mac OS 10.10; it is standard Python 2.7
-# so it should also run in Unix or Windows.
+# This program has been successfully run under Mac OS 10.10; it is standard
+# Python 2.7 so it should also run in Unix or Windows.
 #
 # INITIAL PROVENANCE:
 # Programmer: Philip A. Schrodt
-#			  Parus Analytics
-#			  Charlottesville, VA, 22901 U.S.A.
-#			  http://eventdata.parusanalytics.com
+#             Parus Analytics
+#             Charlottesville, VA, 22901 U.S.A.
+#             http://eventdata.parusanalytics.com
 #
 # GitHub repository: https://github.com/openeventdata/petrarch
 #
 # Copyright (c) 2014	Philip A. Schrodt.	All rights reserved.
 #
-# This project is part of the Open Event Data Alliance tool set; earlier developments 
-# were funded in part by National Science Foundation grant SES-1259190
+# This project is part of the Open Event Data Alliance tool set; earlier
+# developments were funded in part by National Science Foundation grant
+# SES-1259190
 #
 # This code is covered under the MIT license
 #
@@ -27,8 +28,9 @@
 #
 # REVISION HISTORY:
 # 22-Nov-13:	Initial version
-# Summer-14:	Numerous modifications to handle synonyms in actor and verb dictionaries
-# 20-Nov-14:	write_actor_root/text added to parse_Config  
+# Summer-14:	Numerous modifications to handle synonyms in actor and verb
+#               dictionaries
+# 20-Nov-14:	write_actor_root/text added to parse_Config
 # ------------------------------------------------------------------------
 
 from __future__ import print_function
@@ -49,7 +51,6 @@ except ImportError:
 
 import PETRglobals
 import utilities
-
 """
 CONVERTING TABARI DICTIONARIES TO PETRARCH FORMAT
 
@@ -64,13 +65,12 @@ CONVERTING TABARI DICTIONARIES TO PETRARCH FORMAT
 
 """
 
-
 # ================== STRINGS ================== #
 
 ErrMsgMissingDate = "<Sentence> missing required date; record was skipped"
 
-
 # ================== EXCEPTIONS ================== #
+
 
 class DateError(Exception):  # invalid date
     pass
@@ -80,24 +80,24 @@ class DateError(Exception):  # invalid date
 
 def parse_Config(config_path):
     """
-    Parse PETRglobals.ConfigFileName. The file should be ; the default is PETR_config.ini
-    in the working directory but this can be changed using the -c option in the command
-    line. Most of the entries are obvious (but will eventually be documented) with the
-    exception of
+    Parse PETRglobals.ConfigFileName. The file should be ; the default is
+    PETR_config.ini in the working directory but this can be changed using the
+    -c option in the command line. Most of the entries are obvious (but will
+    eventually be documented) with the exception of
 
-    1. actorfile_list and textfile_list are comma-delimited lists. Per the usual rules
-            for Python config files, these can be continued on the next line provided the
-            the first char is a space or tab.
+    1. actorfile_list and textfile_list are comma-delimited lists. Per the usual
+    rules for Python config files, these can be continued on the next line
+    provided the the first char is a space or tab.
 
-    2. If both textfile_list and textfile_name are present, textfile_list takes priority.
-       textfile_list should be the name of a file containing text file names; # is allowed
-       as a comment delimiter at the beginning of individual lines and following the file
-       name.
+    2. If both textfile_list and textfile_name are present, textfile_list takes
+    priority.  textfile_list should be the name of a file containing text file
+    names; # is allowed as a comment delimiter at the beginning of individual
+    lines and following the file name.
 
     3. For additional info on config files, see
-                    http://docs.python.org/3.4/library/configparser.html
-       or try Google, but basically, it is fairly simple, and you can probably just
-       follow the examples.
+    http://docs.python.org/3.4/library/configparser.html or try Google, but
+    basically, it is fairly simple, and you can probably just follow the
+    examples.
     """
 
     def get_config_boolean(optname):
@@ -105,30 +105,34 @@ def parse_Config(config_path):
         If optname not present, returns False """
         if parser.has_option('Options', optname):
             try:
-                result = parser.getboolean('Options',optname)
-                print(optname,"=", result)
+                result = parser.getboolean('Options', optname)
+                print(optname, "=", result)
                 return result
             except ValueError:
-                print("Error in config.ini: "+optname+" value must be `true' or `false'")
+                print("Error in config.ini: " + optname +
+                      " value must be `true' or `false'")
                 raise
         else:
             return False
 
     print('\n', end=' ')
     parser = ConfigParser()
-#		logger.info('Found a config file in working directory')
-#	print "pc",PETRglobals.ConfigFileName
+    # logger.info('Found a config file in working directory')
+    # print "pc",PETRglobals.ConfigFileName
     confdat = parser.read(config_path)
     if len(confdat) == 0:
-        print("\aError: Could not find the config file:", PETRglobals.ConfigFileName)
+        print("\aError: Could not find the config file:",
+              PETRglobals.ConfigFileName)
         print("Terminating program")
         sys.exit()
 
     try:
         PETRglobals.VerbFileName = parser.get('Dictionaries', 'verbfile_name')
-        PETRglobals.AgentFileName = parser.get('Dictionaries','agentfile_name')
-#		print "pc",PETRglobals.AgentFileName
-        PETRglobals.DiscardFileName = parser.get( 'Dictionaries','discardfile_name')
+        PETRglobals.AgentFileName = parser.get(
+            'Dictionaries', 'agentfile_name')
+        #		print "pc",PETRglobals.AgentFileName
+        PETRglobals.DiscardFileName = parser.get('Dictionaries',
+                                                 'discardfile_name')
 
         direct = parser.get('StanfordNLP', 'stanford_dir')
         PETRglobals.stanfordnlp = os.path.expanduser(direct)
@@ -146,12 +150,13 @@ def parse_Config(config_path):
                 try:
                     fpar = open(filename, 'r')
                 except IOError:
-                    print("\aError: Could not find the text file list file:", filename)
+                    print("\aError: Could not find the text file list file:",
+                          filename)
                     print("Terminating program")
                     sys.exit()
                 PETRglobals.TextFileList = []
                 line = fpar.readline()
-                while len(line) > 0:   # go through the entire file
+                while len(line) > 0:  # go through the entire file
                     if '#' in line:
                         line = line[:line.find('#')]
                     line = line.strip()
@@ -163,37 +168,43 @@ def parse_Config(config_path):
 #		print "pc",PETRglobals.TextFileList
 
         if parser.has_option('Dictionaries', 'issuefile_name'):
-            PETRglobals.IssueFileName = parser.get('Dictionaries','issuefile_name')
+            PETRglobals.IssueFileName = parser.get('Dictionaries',
+                                                   'issuefile_name')
 
         if parser.has_option('Options', 'new_actor_length'):
             try:
-                PETRglobals.NewActorLength = parser.getint('Options','new_actor_length')
+                PETRglobals.NewActorLength = parser.getint('Options',
+                                                           'new_actor_length')
             except ValueError:
-                print("Error in config.ini Option: new_actor_length value must be an integer")
+                print(
+                    "Error in config.ini Option: new_actor_length value must be an integer")
                 raise
         print("new_actor_length =", PETRglobals.NewActorLength)
-        
+
         PETRglobals.StoponError = get_config_boolean('stop_on_error')
         PETRglobals.WriteActorRoot = get_config_boolean('write_actor_root')
         PETRglobals.WriteActorText = get_config_boolean('write_actor_text')
 
-        if parser.has_option('Options', 'require_dyad'):  # this one defaults to True
+        if parser.has_option('Options',
+                             'require_dyad'):  # this one defaults to True
             PETRglobals.RequireDyad = get_config_boolean('require_dyad')
         else:
             PETRglobals.RequireDyad = True
-
 
         # otherwise this was set in command line
         if len(PETRglobals.EventFileName) == 0:
             PETRglobals.EventFileName = parser.get('Options', 'eventfile_name')
 
-        PETRglobals.CodeBySentence = parser.has_option('Options','code_by_sentence')
+        PETRglobals.CodeBySentence = parser.has_option('Options',
+                                                       'code_by_sentence')
         print("code-by-sentence", PETRglobals.CodeBySentence)
-        
-        PETRglobals.PauseBySentence = parser.has_option('Options','pause_by_sentence')
+
+        PETRglobals.PauseBySentence = parser.has_option('Options',
+                                                        'pause_by_sentence')
         print("pause_by_sentence", PETRglobals.PauseBySentence)
-        
-        PETRglobals.PauseByStory = parser.has_option('Options','pause_by_story')
+
+        PETRglobals.PauseByStory = parser.has_option('Options',
+                                                     'pause_by_story')
         print("pause_by_story", PETRglobals.PauseByStory)
 
         try:
@@ -210,38 +221,42 @@ def parse_Config(config_path):
             elif parser.has_option('Options', 'comma_emax'):
                 PETRglobals.CommaEMax = parser.getint('Options', 'comma_emax')
         except ValueError:
-            print("Error in config.ini Option: comma_*  value must be an integer")
+            print(
+                "Error in config.ini Option: comma_*  value must be an integer")
             raise
         print("Comma-delimited clause elimination:")
         print("Initial :", end=' ')
         if PETRglobals.CommaBMax == 0:
             print("deactivated")
         else:
-            print("min =", PETRglobals.CommaBMin, "   max =", PETRglobals.CommaBMax)
+            print("min =", PETRglobals.CommaBMin, "   max =",
+                  PETRglobals.CommaBMax)
         print("Internal:", end=' ')
         if PETRglobals.CommaMax == 0:
             print("deactivated")
         else:
-            print("min =", PETRglobals.CommaMin, "   max =", PETRglobals.CommaMax)
+            print("min =", PETRglobals.CommaMin, "   max =",
+                  PETRglobals.CommaMax)
         print("Terminal:", end=' ')
         if PETRglobals.CommaEMax == 0:
             print("deactivated")
         else:
-            print("min =", PETRglobals.CommaEMin, "   max =", PETRglobals.CommaEMax)
+            print("min =", PETRglobals.CommaEMin, "   max =",
+                  PETRglobals.CommaEMax)
 
     except Exception as e:
-        print('parse_config() encountered an error: check the options in', PETRglobals.ConfigFileName)
+        print('parse_config() encountered an error: check the options in',
+              PETRglobals.ConfigFileName)
         print("Terminating program")
         sys.exit()
 #		logger.warning('Problem parsing config file. {}'.format(e))
-
 
 # ================== PRIMARY INPUT USING FIN ================== #
 
 
 def open_FIN(filename, descrstr):
-# opens the global input stream fin using filename;
-# descrstr provides information about the file in the event it isn't found
+    # opens the global input stream fin using filename;
+    # descrstr provides information about the file in the event it isn't found
     global FIN
     global FINline, FINnline, CurrentFINname
     try:
@@ -255,9 +270,9 @@ def open_FIN(filename, descrstr):
 
 
 def close_FIN():
-# closes the global input stream fin.
-# IOError should only happen during debugging or if something has seriously gone wrong
-# with the system, so exit if this occurs.
+    # closes the global input stream fin.
+    # IOError should only happen during debugging or if something has seriously gone wrong
+    # with the system, so exit if this occurs.
     global FIN
     try:
         FIN.close()
@@ -316,11 +331,12 @@ def read_FIN_line():
     line = FIN.readline()
     FINnline += 1
     while True:
-#		print '==',line,
+        #		print '==',line,
         if len(line) == 0:
             break  # calling function needs to handle EOF
         # deal with simple lines we need to skip
-        if line[0] == '#' or line[0] == '\n' or line[0:2] == '<!' or len(line.strip()) == 0:
+        if line[0] == '#' or line[0] == '\n' or line[0:2] == '<!' or len(
+                line.strip()) == 0:
             line = FIN.readline()
             FINnline += 1
             continue
@@ -349,32 +365,32 @@ def read_FIN_line():
     FINline = line
     return line
 
-
 # ========================== TAG EVALUATION FUNCTIONS ========================== #
 
+
 def find_tag(tagstr):
-# reads fin until tagstr is found
-# can inherit EOFError raised in PETRreader.read_FIN_line()
+    # reads fin until tagstr is found
+    # can inherit EOFError raised in PETRreader.read_FIN_line()
     line = read_FIN_line()
     while (tagstr not in line):
         line = read_FIN_line()
 
 
 def extract_attributes(theline):
-# puts list of attribute and content pairs in the global AttributeList. First item is
-# the tag itself
-# If a twice-double-quote occurs -- "" -- this treated as "\"
-# still to do: need error checking here
+    # puts list of attribute and content pairs in the global AttributeList. First item is
+    # the tag itself
+    # If a twice-double-quote occurs -- "" -- this treated as "\"
+    # still to do: need error checking here
     """
     Structure of attributes extracted to AttributeList
     At present, these always require a quoted field which follows an '=', though it
     probably makes sense to make that optional and allow attributes without content
     """
-#	print "PTR-1:", theline,
+    #	print "PTR-1:", theline,
     theline = theline.strip()
     if ' ' not in theline:  # theline only contains a keyword
         PETRglobals.AttributeList = theline[1:-2]
-#		print "PTR-1.1:", PETRglobals.AttributeList
+        #		print "PTR-1.1:", PETRglobals.AttributeList
         return
     pline = theline[1:].partition(' ')  # skip '<'
     PETRglobals.AttributeList = [pline[0]]
@@ -384,7 +400,7 @@ def extract_attributes(theline):
         PETRglobals.AttributeList.append(pline[0].strip())
         theline = pline[2]
         pline = theline.partition('"')
-        if pline[2][0] == '"':   # twice-double-quote
+        if pline[2][0] == '"':  # twice-double-quote
             pline = pline[2][1:].partition('"')
             PETRglobals.AttributeList.append('"' + pline[0] + '"')
             theline = pline[2][1:]
@@ -397,12 +413,12 @@ def extract_attributes(theline):
 
 def check_attribute(targattr):
     """ Looks for targetattr in AttributeList; returns value if found, null string otherwise."""
-# This is used if the attribute is optional (or if error checking is handled by the calling
-# routine); if an error needs to be raised, use get_attribute()
+    # This is used if the attribute is optional (or if error checking is handled by the calling
+    # routine); if an error needs to be raised, use get_attribute()
     if (targattr in PETRglobals.AttributeList):
         return (
-            PETRglobals.AttributeList[
-                PETRglobals.AttributeList.index(targattr) + 1]
+            PETRglobals.AttributeList[PETRglobals.AttributeList.index(targattr)
+                                      + 1]
         )
     else:
         return ""
@@ -412,15 +428,15 @@ def get_attribute(targattr):
     """ Similar to check_attribute() except it raises a MissingAttr error when the attribute is missing."""
     if (targattr in PETRglobals.AttributeList):
         return (
-            PETRglobals.AttributeList[
-                PETRglobals.AttributeList.index(targattr) + 1]
+            PETRglobals.AttributeList[PETRglobals.AttributeList.index(targattr)
+                                      + 1]
         )
     else:
         raise MissingAttr
         return ""
 
-
 # ================== ANCILLARY DICTIONARY INPUT ================== #
+
 
 def read_discard_list(discard_path):
     """
@@ -618,7 +634,6 @@ def read_issue_list(issue_path):
             PETRglobals.IssueList.append(tuple([' ' + item + ' ', codeindex]))
         line = read_FIN_line()
     close_FIN()
-
     """ debug
 	ka = 0
 	while ka < 128 :
@@ -631,7 +646,6 @@ def read_issue_list(issue_path):
 
 def read_verb_dictionary(verb_path):
     """ Reads the verb dictionary from VerbFileName """
-
     """
     ======= VERB DICTIONARY ORGANIZATION =======
 
@@ -875,11 +889,12 @@ def read_verb_dictionary(verb_path):
                 phlist.append(thepat[start:spfind])
                 phlist.append(' ')
                 start = spfind + 1
-                                    # check for missing synsets
+                # check for missing synsets
         ka = 0
         while ka < len(phlist):
             if len(phlist[ka]) > 0:
-                if (phlist[ka][0] == '&') and (phlist[ka] not in PETRglobals.VerbDict):
+                if (phlist[ka][0] == '&') and (
+                        phlist[ka] not in PETRglobals.VerbDict):
                     logger.warning("Synset " + phlist[ka] +
                                    " has not been defined; pattern skipped")
                     raise ValueError  # this will do...
@@ -891,7 +906,7 @@ def read_verb_dictionary(verb_path):
         # need error checking here
         global verb, theverb
         forms = verb[verb.find('{') + 1:verb.find('}')].split()
-#       print '++',forms
+        #       print '++',forms
         for wrd in forms:
             vscr = wrd + " "
             PETRglobals.VerbDict[vscr] = [False, loccode, theverb]
@@ -905,28 +920,31 @@ def read_verb_dictionary(verb_path):
 
         global verb, theverb
         if '{' in verb:
-            forms = verb[verb.find('{')+1:verb.find('}')].split()
+            forms = verb[verb.find('{') + 1:verb.find('}')].split()
             forms.append(verb[:verb.find('{')].strip())
         else:
             forms = [verb]
         for phrase in forms:
-            if '+' in phrase: # otherwise not in correct form so skip it
+            if '+' in phrase:  # otherwise not in correct form so skip it
                 words = phrase.split('_')
                 if words[0].startswith('+'):
                     multilist = [True]
-                    for ka in range(1,len(words)):
+                    for ka in range(1, len(words)):
                         multilist.append(words[ka])
-                    targverb = words[0][1:]+' '
+                    targverb = words[0][1:] + ' '
                 else:
                     multilist = [False]
-                    for ka in range(2,len(words)+1):
-                        multilist.append(words[len(words)-ka])
-                    targverb = words[len(words)-1][1:]+' '
+                    for ka in range(2, len(words) + 1):
+                        multilist.append(words[len(words) - ka])
+                    targverb = words[len(words) - 1][1:] + ' '
 
                 if targverb in PETRglobals.VerbDict:
-                    PETRglobals.VerbDict[targverb].insert(2,[loccode, theverb, tuple(multilist)])
+                    PETRglobals.VerbDict[targverb].insert(2, [loccode, theverb,
+                                                              tuple(multilist)])
                 else:
-                    PETRglobals.VerbDict[targverb] = [True, '---', [loccode, theverb, tuple(multilist)]]
+                    PETRglobals.VerbDict[targverb] = [True, '---',
+                                                      [loccode, theverb,
+                                                       tuple(multilist)]]
 
     def make_verb_forms(loccode):
         """ Create the regular forms of a verb. """
@@ -960,7 +978,7 @@ def read_verb_dictionary(verb_path):
 
     theverb = ''
     newblock = False
-    ka = 0   # primary verb count ( debug )
+    ka = 0  # primary verb count ( debug )
     line = read_FIN_line()
     while len(line) > 0:  # loop through the file
         if '[' in line:
@@ -982,26 +1000,26 @@ def read_verb_dictionary(verb_path):
             newblock = True
             line = read_FIN_line()
 
-        elif verb[0] == '-':   # pattern
+        elif verb[0] == '-':  # pattern
             # TABARI legacy: currently aren't processing these
             if '{' in verb:
                 line = read_FIN_line()
                 continue
 #           print 'RVD-1',verb
-            # resolve the ambiguous '_ ' construction to ' '
+# resolve the ambiguous '_ ' construction to ' '
             verb = verb.replace('_ ', ' ')
             targ = verb[1:].partition('*')
             try:
                 highpat = make_phrase_list(targ[0].lstrip())
-#               print 'RVD-2',highpat
+                #               print 'RVD-2',highpat
                 highpat.reverse()
                 lowphrase = targ[2].rstrip()
                 if len(lowphrase) == 0:
                     lowpat = []
                 else:
-                    lowpat = [targ[2][0]]   # start with connector
+                    lowpat = [targ[2][0]]  # start with connector
                     loclist = make_phrase_list(lowphrase[1:])
-                    lowpat.extend(loclist[:-1])   # don't need the final blank
+                    lowpat.extend(loclist[:-1])  # don't need the final blank
     #           print 'RVD-3',lowpat
                 PETRglobals.VerbDict[theverb].append([highpat, lowpat, code])
             except ValueError:
@@ -1034,7 +1052,8 @@ def read_verb_dictionary(verb_path):
 #           print "rvd/gs:",verb, PETRglobals.VerbDict[verb]
 
         else:  # verb
-# if theverb != '': print '::', theverb, PETRglobals.VerbDict[theverb]
+            # if theverb != '': print '::', theverb,
+            # PETRglobals.VerbDict[theverb]
             if len(code) > 0:
                 curcode = code
             else:
@@ -1056,8 +1075,8 @@ def read_verb_dictionary(verb_path):
                     get_verb_forms(curcode)
                 else:
                     make_verb_forms(curcode)
-            ka += 1   # counting primary verbs
-#           if ka > 16: return
+            ka += 1  # counting primary verbs
+            #           if ka > 16: return
             line = read_FIN_line()
 
 #       print "--:",line,
@@ -1065,14 +1084,14 @@ def read_verb_dictionary(verb_path):
 
 
 def show_verb_dictionary(filename=''):
-# debugging function: displays VerbDict to screen or writes to filename
+    # debugging function: displays VerbDict to screen or writes to filename
     if len(filename) > 0:
         fout = open(filename, 'w')
         fout.write('PETRARCH Verb Dictionary Internal Format\n')
         fout.write('Run time: ' + PETRglobals.RunTimeString + '\n')
 
         for locword, loclist in PETRglobals.VerbDict.items():
-            if locword[0] == '&':   # debug: skip the synsets
+            if locword[0] == '&':  # debug: skip the synsets
                 continue
             fout.write(locword)
             if loclist[0]:
@@ -1080,11 +1099,10 @@ def show_verb_dictionary(filename=''):
                     # pattern list
                     fout.write("::\n" + str(loclist[1:]) + "\n")
                 else:
-                    fout.write(":: " + str(loclist[1]) + "\n")    # simple code
+                    fout.write(":: " + str(loclist[1]) + "\n")  # simple code
             else:
                 # pointer
-                fout.write(
-                    '-> ' + str(loclist[2]) + ' [' + loclist[1] + ']\n')
+                fout.write('-> ' + str(loclist[2]) + ' [' + loclist[1] + ']\n')
         fout.close()
 
     else:
@@ -1092,9 +1110,9 @@ def show_verb_dictionary(filename=''):
             print(locword, end=' ')
             if loclist[0]:
                 if len(loclist) > 2:
-                    print('::\n', loclist[1:])   # pattern list
+                    print('::\n', loclist[1:])  # pattern list
                 else:
-                    print(':: ', loclist[1])   # simple code
+                    print(':: ', loclist[1])  # simple code
             else:
                 print('-> ', loclist[2], '[' + loclist[1] + ']')
 
@@ -1102,8 +1120,8 @@ def show_verb_dictionary(filename=''):
 
 
 def make_noun_list(nounst):
-# parses a noun string -- actor, agent or agent plural -- and returns in a list which
-# has the keyword and initial connector in the first tuple
+    # parses a noun string -- actor, agent or agent plural -- and returns in a list which
+    # has the keyword and initial connector in the first tuple
     nounlist = []
     start = 0
     maxlen = len(nounst) + 1  # this is just a telltail
@@ -1157,7 +1175,7 @@ def dstr_to_ordate(datestring):
 		dstr_to_ordate("16010101")  # 2305814
 	"""
 
-# print datestring        # debug
+    # print datestring        # debug
     try:
         if len(datestring) > 7:
             year = int(datestring[:4])
@@ -1191,10 +1209,10 @@ def dstr_to_ordate(datestring):
         else:
             if day > 28:
                 raise DateError
-    elif month in [4, 6, 9, 11]:         # 30 days have September...
+    elif month in [4, 6, 9, 11]:  # 30 days have September...
         if day > 30:
             raise DateError
-    else:                             # all the rest I don't remember...
+    else:  # all the rest I don't remember...
         if day > 31:
             raise DateError
 
@@ -1205,44 +1223,43 @@ def dstr_to_ordate(datestring):
     yr = year + 4800 - adj
     mo = month + (12 * adj) - 3
     ordate = day + math.floor((153 * mo + 2) / 5) + 365 * yr
-    ordate += math.floor(yr / 4) - math.floor(yr / 100) + \
-        math.floor(yr / 400) - 32045  # pure Julian date
-# print "Julian:", ordate        # debug to cross-check for unit test
-    ordate -= 2305813   # adjust for ANSI date
+    ordate += math.floor(yr / 4) - math.floor(yr / 100) + math.floor(
+        yr / 400) - 32045  # pure Julian date
+    # print "Julian:", ordate        # debug to cross-check for unit test
+    ordate -= 2305813  # adjust for ANSI date
 
-# print ordate        # debug
+    # print ordate        # debug
     return int(ordate)
 
 
 def read_actor_dictionary(actorfile):
-    """ Reads a TABARI-style actor dictionary. """
-    """
-	Actor dictionary list elements:
-	Actors are stored in a dictionary of a list of pattern lists keyed on the first word
-	of the phrase. The pattern lists are sorted by length.
-	The individual pattern lists begin with an integer index to the tuple of possible codes
-	(that is, with the possibility of date restrictions) in PETRglobals.ActorCodes,
-	followed by the connector from the key, and then a series of 2-tuples containing the
-	remaining words and connectors. A 2-tuple of the form ('', ' ') signals the end of the
-	list. <14.02.26: Except at the moment these are just 2-item lists, not tuples, but
-	this could be easily changed and presumably would be more efficient: these are not
-	changed so they don't need to be lists.<>
+    """ Reads a TABARI-style actor dictionary.
+    Actor dictionary list elements: Actors are stored in a dictionary of a list
+    of pattern lists keyed on the first word of the phrase. The pattern lists
+    are sorted by length.  The individual pattern lists begin with an integer
+    index to the tuple of possible codes (that is, with the possibility of date
+    restrictions) in PETRglobals.ActorCodes, followed by the connector from the
+    key, and then a series of 2-tuples containing the remaining words and
+    connectors. A 2-tuple of the form ('', ' ') signals the end of the list.
+    <14.02.26: Except at the moment these are just 2-item lists, not tuples, but
+    this could be easily changed and presumably would be more efficient: these
+    are not changed so they don't need to be lists.<>
 
-	Connector:
-		blank: words can occur between the previous word and the next word
-		_ (underscore): words must be consecutive: no intervening words
+    Connector: blank: words can occur between the previous word and the next
+    word _ (underscore): words must be consecutive: no intervening words
 
-	The codes with possible date restrictions are stored as lists in a [genuine] tuple in
-	PETRglobals.ActorCodes in the following format where
-	'ordate' is an ordinal date:
-		[code] : unrestricted code
-		[0,ordate,code] : < restriction
-		[1,ordate,code] : > restriction
-		[2,ordate,ordate, code] : - (interval) restriction
-	If PETRglobals.WriteActorRoot is True, the final element of a PETRglobals.ActorCodes 
-	list is the text of the actor at the beginning of the synonym list.
+    The codes with possible date restrictions are stored as lists in a [genuine]
+    tuple in PETRglobals.ActorCodes in the following format where 'ordate' is an
+    ordinal date:
+        [code] : unrestricted code
+        [0,ordate,code] : < restriction
+        [1,ordate,code] : > restriction
+        [2,ordate,ordate, code] : - (interval) restriction
+    If PETRglobals.WriteActorRoot is True, the final element of a
+    PETRglobals.ActorCodes list is the text of the actor at the beginning of the
+    synonym list.
 
-	Synonyms simply use the integer code index to point to these tuples.
+    Synonyms simply use the integer code index to point to these tuples.
 
 	STRICT FORMATTING OF THE ACTOR DICTIONARY
 	[With some additional coding, this can be relaxed, but anything following these
@@ -1320,9 +1337,10 @@ def read_actor_dictionary(actorfile):
 		[AFGGOV 791227-861124]
 		[AFGGOV 791227-810611]
 
-	"""
+    """
 
-    dateerrorstr = "String in date restriction could not be interpreted; line skipped"
+    dateerrorstr = ("String in date restriction could not be interpreted; "
+                    "line skipped")
 
     logger = logging.getLogger('petr_log')
     logger.info("Reading " + actorfile)
@@ -1338,7 +1356,7 @@ def read_actor_dictionary(actorfile):
         if '---STOP---' in line:
             break
         if line[0] == '\t':  # deal with date restriction
-# print "DR:",line,   # debug
+            # print "DR:",line,   # debug
             try:
                 brack = line.index('[')
             except ValueError:
@@ -1383,8 +1401,8 @@ def read_actor_dictionary(actorfile):
                     line = read_FIN_line()
                     continue
                 if ord2 < ord1:
-                    logger.warning(
-                        "End date in interval date restriction is less than starting date; line skipped")
+                    logger.warning("End date in interval date restriction is "
+                                   "less than starting date; line skipped")
                     line = read_FIN_line()
                     continue
                 curlist.append([2, ord1, ord2, code])
@@ -1394,15 +1412,17 @@ def read_actor_dictionary(actorfile):
 
         else:
             if line[0] == '+':  # deal with synonym
-#				print "Syn:",line,
+                # print "Syn:",line,
                 part = line.partition(';')  # split on comment, if any
                 actor = part[0][1:].strip() + ' '
-            else:  					# primary phrase with code
+            else:  # primary phrase with code
                 if len(curlist) > 0:
                     if PETRglobals.WriteActorRoot:
-                    	curlist.append(rootactor)
+                        curlist.append(rootactor)
 #                    print(curlist)
-                    PETRglobals.ActorCodes.append(tuple(curlist)) # store code from previous entry
+                    PETRglobals.ActorCodes.append(
+                        tuple(curlist)
+                    )  # store code from previous entry
                     """print(PETRglobals.ActorCodes[-1])
                     thelist = PETRglobals.ActorCodes[-1]
                     for item in thelist:
@@ -1434,7 +1454,7 @@ def read_actor_dictionary(actorfile):
         line = read_FIN_line()
 
     close_FIN()
-#    <14.11.20: does this need to save the final entry? >
+    #    <14.11.20: does this need to save the final entry? >
 
     # sort the patterns by the number of words
     for lockey in list(PETRglobals.ActorDict.keys()):
@@ -1442,7 +1462,7 @@ def read_actor_dictionary(actorfile):
 
 
 def show_actor_dictionary(filename=''):
-# debugging function: displays ActorDict to screen or writes to filename
+    # debugging function: displays ActorDict to screen or writes to filename
     if len(filename) > 0:
         fout = open(filename, 'w')
         fout.write(
@@ -1464,7 +1484,7 @@ def show_actor_dictionary(filename=''):
         for locword, loclist in PETRglobals.ActorDict.items():
             print(locword, "::")
             if isinstance(loclist[0][0], str):
-                print(loclist)   # debug
+                print(loclist)  # debug
             else:
                 print('PTR,', loclist)
 
@@ -1472,10 +1492,10 @@ def show_actor_dictionary(filename=''):
 # ================== AGENT DICTIONARY INPUT ================== #
 def read_agent_dictionary(agent_path):
     """ Reads an agent dictionary
-    Agents are stored in a simpler version of the Actors dictionary: a list of phrases
-    keyed on the first word of the phrase.
-    The individual phrase lists begin with the code, the connector from the key, and then
-    a series of 2-tuples containing the remaining words and connectors. A 2-tuple of the
+    Agents are stored in a simpler version of the Actors dictionary: a list of
+    phrases keyed on the first word of the phrase.  The individual phrase lists
+    begin with the code, the connector from the key, and then a series of
+    2-tuples containing the remaining words and connectors. A 2-tuple of the
     form ('', ' ') signals the end of the list.
 
     Connector:
@@ -1483,9 +1503,9 @@ def read_agent_dictionary(agent_path):
             _ (underscore): words must be consecutive: no intervening words
 
     FORMATTING OF THE AGENT DICTIONARY
-    [With some additional coding, this can be relaxed, but anything following these
-    rules should read correctly]
-    Basic structure is a series of records of the form
+    [With some additional coding, this can be relaxed, but anything following
+    these rules should read correctly] Basic structure is a series of records of
+    the form
             phrase_string {optional plural}  [agent_code]
 
     Material that is ignored
@@ -1493,29 +1513,31 @@ def read_agent_dictionary(agent_path):
     2. Any line beginning with '#' or '<!'
     3. Any null line (that is, line consisting of only \n
 
-    A "phrase string" is a set of character strings separated by either blanks or
-    underscores.
+    A "phrase string" is a set of character strings separated by either blanks
+    or underscores.
 
-    A "agent_code" is a character string without blanks that is either preceded (typically)
-    or followed by '~'. If the '~' precedes the code, the code is added after the actor
-    code; if it follows the code, the code is added before the actor code (usually done
-    for organizations, e.g. NGO~)
+    A "agent_code" is a character string without blanks that is either preceded
+    (typically) or followed by '~'. If the '~' precedes the code, the code is
+    added after the actor code; if it follows the code, the code is added before
+    the actor code (usually done for organizations, e.g. NGO~)
 
     Plurals:
-            Regular plurals -- those formed by adding 'S' to the root, adding 'IES' if the
-            root ends in 'Y', and added 'ES' if the root ends in 'SS' -- are generated automatically
+            Regular plurals -- those formed by adding 'S' to the root, adding
+            'IES' if the root ends in 'Y', and added 'ES' if the root ends in
+            'SS' -- are generated automatically
 
             If the plural has some other form, it follows the root inside {...}
 
-            If a plural should not be formed -- that is, the root is only singular or only
-            plural, or the singular and plural have the same form (e.g. "police"), use a null
-            string inside {}.
+            If a plural should not be formed -- that is, the root is only
+            singular or only plural, or the singular and plural have the same
+            form (e.g. "police"), use a null string inside {}.
 
-            If there is more than one form of the plural -- "attorneys general" and "attorneys
-            generals" are both in use -- just make a second entry with one of the plural forms
-            nulled (though in this instance -- ain't living English wonderful? -- you could null
-            the singular and use an automatic plural on the plural form) Though in a couple
-            test sentences, this phrase confused SCNLP.
+            If there is more than one form of the plural -- "attorneys general"
+            and "attorneys generals" are both in use -- just make a second entry
+            with one of the plural forms nulled (though in this instance --
+            ain't living English wonderful? -- you could null the singular and
+            use an automatic plural on the plural form) Though in a couple test
+            sentences, this phrase confused SCNLP.
 
     Substitution Markers:
             These are used to handle complex equivalents, notably
@@ -1528,10 +1550,12 @@ def read_agent_dictionary(agent_path):
                     CONGRESS!PERSON! [~LEG]
                     !MINIST!_OF_INTERNAL_AFFAIRS
 
-            The marker for the substitution set is of the form !...! and is followed by an =
-            and a comma-delimited list; spaces are stripped from the elements of the list so
-            these can be added for clarity. Every time in the list is substituted for the marker,
-            with no additional plural formation, so the first construction would generate
+            The marker for the substitution set is of the form !...! and is
+            followed by an = and a comma-delimited list; spaces are stripped
+            from the elements of the list so these can be added for clarity.
+            Every time in the list is substituted for the marker, with no
+            additional plural formation, so the first construction would
+            generate
 
                     CONGRESSMAN [~LEG]
                     CONGRESSMEN [~LEG]
@@ -1561,7 +1585,7 @@ def read_agent_dictionary(agent_path):
     global subdict
 
     def store_agent(nounst, code):
-    # parses nounstring and stores the result with code
+        # parses nounstring and stores the result with code
         nounlist = make_noun_list(nounst)
         keyword = nounlist[0][0]
         phlist = [code, nounlist[0][1]] + nounlist[1:]
@@ -1577,25 +1601,25 @@ def read_agent_dictionary(agent_path):
 
     def define_marker(line):
         global subdict
-        if line[line.find('!') + 1:].find('!') < 0 or line[line.find('!'):].find('=') < 0:
+        if line[line.find('!') + 1:].find(
+                '!') < 0 or line[line.find('!'):].find('=') < 0:
             logger.warning(markdeferrorstr + enderrorstr)
             return
         ka = line.find('!') + 1
         marker = line[ka:line.find('!', ka)]
-#		print marker
+        # print marker
         loclist = line[line.find('=', ka) + 1:].strip()
         subdict[marker] = []
         for item in loclist.split(','):
             subdict[marker].append(item.strip())
-#		print subdict[marker]
+# print subdict[marker]
 
     def store_marker(agent, code):
         global subdict
         if agent[agent.find('!') + 1:].find('!') < 0:
             ka = agent.find('!')
-            logger.warning("Substitution marker \"" +
-                           agent[ka:agent.find(' ', ka) + 1] +
-                           "\" syntax incorrect" + enderrorstr)
+            logger.warning("Substitution marker \"" + agent[ka:agent.find(
+                ' ', ka) + 1] + "\" syntax incorrect" + enderrorstr)
             return
         part = agent.partition('!')
         part2 = part[2].partition('!')
@@ -1604,11 +1628,12 @@ def read_agent_dictionary(agent_path):
                            "! missing in .agents file; line skipped")
             return
         for subst in subdict[part2[0]]:
-#			print part[0]+subst+part2[2]
+            # print part[0]+subst+part2[2]
             store_agent(part[0] + subst + part2[2], code)
 
     # this is just called when the program is loading, so keep them local.
-    # <14.04.22> Or just put these as constants in the function calls: does it make a difference?
+    # <14.04.22> Or just put these as constants in the function calls: does it
+    # make a difference?
     enderrorstr = " in .agents file ; line skipped"
     codeerrorstr = "Codes are required for agents"
     brackerrorstr = "Missing '}'"
@@ -1655,7 +1680,7 @@ def read_agent_dictionary(agent_path):
             else:
                 plural = agent[:-1] + 'S'
 
-#			print agent,plural
+# print agent,plural
         store_agent(agent, code)
         if len(plural) > 0:
             store_agent(plural + ' ', code)
@@ -1670,7 +1695,7 @@ def read_agent_dictionary(agent_path):
 
 
 def show_AgentDict(filename=''):
-# debugging function: displays AgentDict to screen or writes to filename
+    # debugging function: displays AgentDict to screen or writes to filename
     if len(filename) > 0:
         fout = open(filename, 'w')
         fout.write('PETRARCH Agent Dictionary Internal Format\n')
@@ -1726,8 +1751,10 @@ def read_xml_input(filepaths, parsed=False):
                 story = elem
 
                 # Check to make sure all the proper XML attributes are included
-                attribute_check = [key in story.attrib for key in
-                                   ['date', 'id', 'sentence', 'source']]
+                attribute_check = [
+                    key in story.attrib
+                    for key in ['date', 'id', 'sentence', 'source']
+                ]
                 if not attribute_check:
                     print('Need to properly format your XML...')
                     break
@@ -1749,10 +1776,14 @@ def read_xml_input(filepaths, parsed=False):
                     text = story.find('Text').text
                     text = text.replace('\n', '').replace('  ', '')
                     sent_dict = {'content': text, 'parsed': parsed_content}
-                    meta_content = {'date': story.attrib['date'],
-                                    'source': story.attrib['source']}
-                    content_dict = {'sents': {sent_id: sent_dict},
-                                    'meta': meta_content}
+                    meta_content = {
+                        'date': story.attrib['date'],
+                        'source': story.attrib['source']
+                    }
+                    content_dict = {
+                        'sents': {sent_id: sent_dict},
+                        'meta': meta_content
+                    }
                 else:
                     entry_id = story.attrib['id']
 
@@ -1762,8 +1793,10 @@ def read_xml_input(filepaths, parsed=False):
                     # TODO Make the number of sents a setting
                     sent_dict = {}
                     for i, sent in enumerate(split_sents[:7]):
-                        sent_dict[i] = {'content': sent, 'parsed':
-                                        parsed_content}
+                        sent_dict[
+                            i
+                        ] = {'content': sent,
+                             'parsed': parsed_content}
 
                     meta_content = {'date': story.attrib['date']}
                     content_dict = {'sents': sent_dict, 'meta': meta_content}
@@ -1805,11 +1838,13 @@ def read_pipeline_input(pipeline_list):
     holding = {}
     for entry in pipeline_list:
         entry_id = str(entry['_id'])
-        meta_content = {'date': utilities._format_datestr(entry['date']),
-                        'date_added': entry['date_added'],
-                        'source': entry['source'],
-                        'story_title': entry['title'],
-                        'url': entry['url']}
+        meta_content = {
+            'date': utilities._format_datestr(entry['date']),
+            'date_added': entry['date_added'],
+            'source': entry['source'],
+            'story_title': entry['title'],
+            'url': entry['url']
+        }
         if 'parsed_sents' in entry:
             parsetrees = entry['parsed_sents']
         else:
@@ -1875,20 +1910,20 @@ def _sentence_segmenter(paragr):
 
     # source: LbjNerTagger1.11.release/Data/KnownLists/known_title.lst from
     # University of Illinois with editing
-    ABBREV_LIST = ['mrs.', 'ms.', 'mr.', 'dr.', 'gov.', 'sr.', 'rev.', 'r.n.',
-                   'pres.', 'treas.', 'sect.', 'maj.', 'ph.d.', 'ed. psy.',
-                   'proc.', 'fr.', 'asst.', 'p.f.c.', 'prof.', 'admr.',
-                   'engr.', 'mgr.', 'supt.', 'admin.', 'assoc.', 'voc.',
-                   'hon.', 'm.d.', 'dpty.', 'sec.', 'capt.', 'c.e.o.',
-                   'c.f.o.', 'c.i.o.', 'c.o.o.', 'c.p.a.', 'c.n.a.', 'acct.',
-                   'llc.', 'inc.', 'dir.', 'esq.', 'lt.', 'd.d.', 'ed.',
-                   'revd.', 'psy.d.', 'v.p.', 'senr.', 'gen.', 'prov.',
-                   'cmdr.', 'sgt.', 'sen.', 'col.', 'lieut.', 'cpl.', 'pfc.',
-                   'k.p.h.', 'cent.', 'deg.', 'doz.', 'Fahr.', 'Cel.', 'F.',
-                   'C.', 'K.', 'ft.', 'fur.', 'gal.', 'gr.', 'in.', 'kg.',
-                   'km.', 'kw.', 'l.', 'lat.', 'lb.', 'lb per sq in.', 'long.',
-                   'mg.', 'mm.,, m.p.g.', 'm.p.h.', 'cc.', 'qr.', 'qt.', 'sq.',
-                   't.', 'vol.', 'w.', 'wt.']
+    ABBREV_LIST = [
+        'mrs.', 'ms.', 'mr.', 'dr.', 'gov.', 'sr.', 'rev.', 'r.n.', 'pres.',
+        'treas.', 'sect.', 'maj.', 'ph.d.', 'ed. psy.', 'proc.', 'fr.',
+        'asst.', 'p.f.c.', 'prof.', 'admr.', 'engr.', 'mgr.', 'supt.', 'admin.',
+        'assoc.', 'voc.', 'hon.', 'm.d.', 'dpty.', 'sec.', 'capt.', 'c.e.o.',
+        'c.f.o.', 'c.i.o.', 'c.o.o.', 'c.p.a.', 'c.n.a.', 'acct.', 'llc.',
+        'inc.', 'dir.', 'esq.', 'lt.', 'd.d.', 'ed.', 'revd.', 'psy.d.', 'v.p.',
+        'senr.', 'gen.', 'prov.', 'cmdr.', 'sgt.', 'sen.', 'col.', 'lieut.',
+        'cpl.', 'pfc.', 'k.p.h.', 'cent.', 'deg.', 'doz.', 'Fahr.', 'Cel.',
+        'F.', 'C.', 'K.', 'ft.', 'fur.', 'gal.', 'gr.', 'in.', 'kg.', 'km.',
+        'kw.', 'l.', 'lat.', 'lb.', 'lb per sq in.', 'long.', 'mg.',
+        'mm.,, m.p.g.', 'm.p.h.', 'cc.', 'qr.', 'qt.', 'sq.', 't.', 'vol.',
+        'w.', 'wt.'
+    ]
 
     sentlist = []
     # controls skipping over non-terminal conditions
@@ -1899,14 +1934,15 @@ def _sentence_segmenter(paragr):
         if paragr[terloc.start()] == '.':
             if (paragr[terloc.start() - 1].isupper() and
                     paragr[terloc.start() - 2] == ' '):
-                        isok = False      # single initials
+                isok = False  # single initials
             else:
                 # check abbreviations
                 loc = paragr.rfind(' ', 0, terloc.start() - 1)
                 if loc > 0:
                     if paragr[loc + 1:terloc.start() + 1].lower() in ABBREV_LIST:
                         isok = False
-        if paragr[:terloc.start()].count('(') != paragr[:terloc.start()].count(')'):
+        if paragr[:terloc.start()].count('(') != paragr[:terloc.start()].count(
+                ')'):
             isok = False
         if paragr[:terloc.start()].count('"') % 2 != 0:
             isok = False
