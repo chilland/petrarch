@@ -118,7 +118,6 @@ def parse_Config(config_path):
     print('\n', end=' ')
     parser = ConfigParser()
     # logger.info('Found a config file in working directory')
-    # print "pc",PETRglobals.ConfigFileName
     confdat = parser.read(config_path)
     if len(confdat) == 0:
         print("\aError: Could not find the config file:",
@@ -130,7 +129,6 @@ def parse_Config(config_path):
         PETRglobals.VerbFileName = parser.get('Dictionaries', 'verbfile_name')
         PETRglobals.AgentFileName = parser.get(
             'Dictionaries', 'agentfile_name')
-        # print "pc",PETRglobals.AgentFileName
         PETRglobals.DiscardFileName = parser.get('Dictionaries',
                                                  'discardfile_name')
 
@@ -164,8 +162,6 @@ def parse_Config(config_path):
                         PETRglobals.TextFileList.append(line)
                     line = fpar.readline()
                 fpar.close()
-
-#    print "pc",PETRglobals.TextFileList
 
         if parser.has_option('Dictionaries', 'issuefile_name'):
             PETRglobals.IssueFileName = parser.get('Dictionaries',
@@ -290,50 +286,18 @@ def read_FIN_line():
     beginning with # returns next non-empty line or EOF
     tracks the current line number (FINnline) and content (FINline)
     calling function needs to handle EOF (len(line) == 0)
-    """
-    """
-    Comments in input files: Comments should be delineated in the XML style
-    (which is inherited from HTML which inherited it from SGML) are allowed, as
-    long as you don't get too clever. Basically, anything that looks like any of
-    these
-
-        <!-- [comment] -->
-
-        things I want to actually read <!-- [comment] -->
-
-        some things I want <!-- [comment] --> and more of them
-
-        <!-- start of the comment
-        [1 or more additional lines
-        end of the comment -->
-
-    is treated like a comment and skipped.
-
-    Note: the system doesn't use the formal definition that also says '--' is
-    not allowed inside a comment: it just looks for --> as a terminator
-
-    The system is *not* set up to handle clever variations like nested comments,
-    multiple comments on a line, or non-comment information in multi-line
-    comments: yes, we are perfectly capable of writing code that could handle
-    these contingencies, but it is not a priority at the moment. We trust you
-    can cope within these limits.
 
     For legacy purposes, the perl/Python one-line comment delimiter # the
-    beginning of a line is also recognized.
-
-    To accommodate my habits, the perl/Python one-line comment delimiter ' #' is
-    also recognized at the end of a line and material following it is
-    eliminated. Note that the initial space is required.
-
-    Blank lines and lines with only whitespace are also skipped.
+    beginning of a line is also recognized. Blank lines and lines with only
+    whitespace are also skipped.
     """
+
     global FIN
     global FINline, FINnline
 
     line = FIN.readline()
     FINnline += 1
     while True:
-        # print '==',line,
         if len(line) == 0:
             break  # calling function needs to handle EOF
         # deal with simple lines we need to skip
@@ -363,7 +327,6 @@ def read_FIN_line():
             break
         line = FIN.readline()
         FINnline += 1
-# print "++",line
     FINline = line
     return line
 
@@ -387,12 +350,12 @@ def extract_attributes(theline):
     require a quoted field which follows an '=', though it probably makes sense
     to make that optional and allow attributes without content
     """
-    # print "PTR-1:", theline,
+
     theline = theline.strip()
     if ' ' not in theline:  # theline only contains a keyword
         PETRglobals.AttributeList = theline[1:-2]
-        # print "PTR-1.1:", PETRglobals.AttributeList
         return
+
     pline = theline[1:].partition(' ')  # skip '<'
     PETRglobals.AttributeList = [pline[0]]
     theline = pline[2]
@@ -409,7 +372,6 @@ def extract_attributes(theline):
             pline = pline[2].partition('"')
             PETRglobals.AttributeList.append(pline[0].strip())
             theline = pline[2]
-# print "PTR-2:", PETRglobals.AttributeList
 
 
 def check_attribute(targattr):
@@ -423,8 +385,7 @@ def check_attribute(targattr):
     if (targattr in PETRglobals.AttributeList):
         return (
             PETRglobals.AttributeList[PETRglobals.AttributeList.index(targattr)
-                                      + 1]
-        )
+                                      + 1])
     else:
         return ""
 
@@ -437,8 +398,7 @@ def get_attribute(targattr):
     if (targattr in PETRglobals.AttributeList):
         return (
             PETRglobals.AttributeList[PETRglobals.AttributeList.index(targattr)
-                                      + 1]
-        )
+                                      + 1])
     else:
         raise MissingAttr
         return ""
@@ -460,30 +420,6 @@ def read_discard_list(discard_path):
 
     File is stored as a simple list and the interpretation of the strings is
     done in check_discards()
-
-    ===== EXAMPLE =====
-    +5K RUN #  ELH 06 Oct 2009
-    +ACADEMY AWARD   # LRP 08 Mar 2004
-    AFL GRAND FINAL   # MleH 06 Aug 2009
-    AFRICAN NATIONS CUP   # ab 13 Jun 2005
-    AMATEUR BOXING TOURNAMENT   # CTA 30 Jul 2009
-    AMELIA EARHART
-    ANDRE AGASSI   # LRP 10 Mar 2004
-    ASIAN CUP   # BNL 01 May 2003
-    ASIAN FOOTBALL   # ATS 9/27/01
-    ASIAN MASTERS CUP   # CTA 28 Jul 2009
-    +ASIAN WINTER GAMES   # sls 14 Mar 2008
-    ATP HARDCOURT TOURNAMENT   # mj 26 Apr 2006
-    ATTACK ON PEARL HARBOR   # MleH 10 Aug 2009
-    AUSTRALIAN OPEN
-    AVATAR   # CTA 14 Jul 2009
-    AZEROTH   # CTA 14 Jul 2009  (World of Warcraft)
-    BADMINTON  # MleH 28 Jul 2009
-    BALLCLUB   # MleH 10 Aug 2009
-    BASEBALL
-    BASKETBALL
-    BATSMAN  # MleH 14 Jul 2009
-    BATSMEN  # MleH 12 Jul 2009
     """
 
     logger = logging.getLogger('petr_log')
@@ -502,7 +438,6 @@ def read_discard_list(discard_path):
         PETRglobals.DiscardList.append(targ.upper())  # case insensitive match
         line = read_FIN_line()
     close_FIN()
-# 	print PETRglobals.DiscardList[:8]
 
 
 def read_issue_list(issue_path):
@@ -526,20 +461,10 @@ def read_issue_list(issue_path):
     The coding is done in check_issues()
 
     Issues are written to the event record as a comma-delimited list to a
-    tab-delimited field, e.g.
-
-    20080801	ABC	EDF	0001	POSTSECONDARY_EDUCATION 2, LITERACY 1
-        AFP0808-01-M008-02
-    20080801	ABC	EDF	0004		AFP0808-01-M007-01
-    20080801	ABC	EDF	0001	NUCLEAR_WEAPONS 1	AFP0808-01-M008-01
-
-    where XXXX NN, corresponds to the issue code and the number of matched
-    phrases in the sentence that generated the event.
+    tab-delimited field.
 
     This feature is optional and triggered by a file name in the PETR_config.ini
-    file at
-
-            issuefile_name = Phoenix.issues.140225.txt
+    file at: issuefile_name = Phoenix.issues.140225.txt
 
     <14.02.28> NOT YET FULLY IMPLEMENTED
     The prefixes '~' and '~~' indicate exclusion phrases:
@@ -550,26 +475,8 @@ def read_issue_list(issue_path):
                 of the issues in section
     In the current code, the occurrence of an ignore phrase of either type
     cancels all coding of issues from the sentence
-
-    ===== EXAMPLE =====
-
-    <ISSUE CATEGORY="ID_ATROCITY">
-    n:atrocity [ID_ATROCITY]
-    n:genocide [ID_ATROCITY]
-    ethnic cleansing [ID_ATROCITY]
-    ethnic v:purge [ID_ATROCITY]
-    ethnic n:purge [ID_ATROCITY]
-    war n:crime [ID_ATROCITY]
-    n:crime against humanity [ID_ATROCITY]
-    n:massacre [ID_ATROCITY]
-    v:massacre [ID_ATROCITY]
-    al+zarqawi network [NAMED_TERROR_GROUP]
-    ~Saturday Night massacre
-    ~St. Valentine's Day massacre
-    ~~Armenian genocide  # not coding historical cases
-    </ISSUE>
-
     """
+
     logger = logging.getLogger('petr_log')
     logger.info("Reading " + PETRglobals.IssueFileName)
     open_FIN(issue_path, "issues")
@@ -644,14 +551,6 @@ def read_issue_list(issue_path):
             PETRglobals.IssueList.append(tuple([' ' + item + ' ', codeindex]))
         line = read_FIN_line()
     close_FIN()
-    """
-    debug
-    ka = 0
-    while ka < 128 :
-        print(PETRglobals.IssueList[ka],PETRglobals.IssueCodes
-        [PETRglobals.IssueList[ka][1]])
-        ka += 1
-    """
 
 # ================== VERB DICTIONARY INPUT ================== #
 
@@ -659,231 +558,8 @@ def read_issue_list(issue_path):
 def read_verb_dictionary(verb_path):
     """
     Reads the verb dictionary from VerbFileName
-
-    ======= VERB DICTIONARY ORGANIZATION =======
-
-    The verb dictionary consists of a set of synsets followed by a series of
-    verb synonyms and patterns.
-
-    VERB SYNONYM BLOCKS AND PATTERNS
-
-    A verb synonym block is a set of verbs which are synonymous (or close
-    enough) with respect to the patterns. The program automatically generates
-    the regular forms of the verb -- see make_verb_forms(loccode) -- if it is
-    regular (and, implicitly, English); otherwise the irregular forms can be
-    specified in {...} following the primary verb.  Note that if irregular forms
-    are provided in {...}, ALL forms need to be included, even if some of those
-    are the same as the regular form. An optional code for the isolated verb can
-    follow in [...].
-
-    The verb block begins with a comment of the form
-
-    --- <GENERAL DESCRIPTION> [<CODE>] ---
-
-    where the "---" signals the beginning of a new block. The code in [...] is
-    the primary code -- typically a two-digit+0 cue-category code -- for the
-    block, and this will be used for all other verbs unless these have their own
-    code. If no code is present, this defaults to the null code "---"  which
-    indicates that the isolated verb does not generate an event. The null code
-    also can be used as a secondary code.
-
-    This is followed by a set of patterns -- these begin with '-' -- which
-    generally follow the same syntax as TABARI patterns. The pattern set is
-    terminated with a blank line.
-
-    -- Multiple-word verbs --
-    Multiple-word "verbs" such as "CONDON OFF", "WIRE TAP" and "BEEF UP" are
-    entered by connecting the word with an underscore (these must be
-    consecutive) and putting a '+' in front of the verb. Alternative forms must
-    be specified: they are not constructed automatically. These are treated in
-    patterns just as single-word verbs are treated.
-
-    Examples
-    +BEEF_UP {+BEEFS_UP +BEEFED_UP +BEEFING_UP}
-    +CORDON_OFF {+CORDONED_OFF +CORDONS_OFF +CORDONING_OFF}
-    WIRE_+TAP {WIRE_+TAPPED  WIRE_+TAPPING }
-
-    SYNSETS
-    Synonym sets (synsets) are labelled with a string beginning with & and
-    defined using the label followed by a series of lines beginning with +
-    containing words or phrases.  The phrases are interpreted as requiring
-    consecutive words; the words can be separated with either spaces or
-    underscores (they are converted to spaces). Synset phrases can only contain
-    words, not $, +, % or ^ tokens or synsets. At present, a synsets cannot
-    contain another synset as an element. [see note below] Synsets be used
-    anywhere in a pattern that a word or phrase can be used. A synset must be
-    defined before it is used: a pattern containing an undefined synset will be
-    ignored -- but those definitions can occur anywhere in the file.
-
-    Plurals are generated automatically using the rules in read_verb_dictionary/
-    make_plural(st) except when
-
-      -- The phrase ends with '_'
-
-      -- The label ends with '_', in which case plurals are not generated for
-         any of the phrases; this is typically used for synonyms that are not
-         nouns
-
-    The '_' is dropped in both cases
-
-    ====== EXAMPLE =====
-
-    &CURRENCY
-    +DOLLARS
-    +EUROS
-    +AUSTRIAN FLORIN
-    +GOLDEN_GOBLIN_GALLEONS_
-    +PESO
-    +KRONER_
-    +YUM YENNYEN
-    +JAVANESE YEN
-    +SWISS FRANCS
-    +YEN
-
-    &ALTCURR
-    +BITCOIN
-    +PIRATE GOLD_
-    +LEPRECHAUN GOLD_
-
-    &AUXVERB3_
-    +HAVE
-    +HAS
-    +HAD
-
-
-    ### GRANT ###
-    GRANT [070]
-    GIVE {GAVE GIVEN GIVING }  # jw  11/14/91
-    CONTRIBUTE # tony  3/12/91
-    - * &CURRENCY [903] # -PAS 12.01.12
-    - * &ALTCURR [904] # -PAS 14.05.08
-    - * RUPEES  [071]
-
-
-    ### EXPLAIN_VERBAL ###
-    EXPLAIN [010]
-    COMMENT
-    ASSERT
-    SAY  {SAID SAYING }
-    CLARIFY {CLARIFIES CLARIFIED CLARIFYING} [040]
-    CLEAR_UP
-    - * RESTORATION RELATIONS [050:050]  # ANNOUNCE <ab 02 Dec 2005>
-    - * COMMIT &MILITARY TO + [0332]  # SAY <sls 13 Mar 2008>
-    - * ATTACK ON + AS &CRIME [018]  # DESCRIBE <ab 31 Dec 2005>
-    - * &CURRENCY DEBT_RELIEF [0331]  # ANNOUNCE <ab 02 Dec 2005>  , ANNOUNCE
-    - * WELCOMED OFFER FROM + [050]  # ANNOUNCE <ab 02 Dec 2005>
-    - * + THAT $ WILL PULLOUT [0356]  # INFORM <sms 30 Nov 2007>
-    - * POSSIBILITY OF &FIGHT [138]  # MENTION <OY 11 Mar 2006>
-    - * AGREED JOIN COALITION [031]  # ANNOUNCE <OY 15 Mar 2006>
-    - * TRACES RESPONSIBILITY [112]  # REPORT
-    - CONFIRMED * OF BOMBINGS [010]  # REPORT
-    - * INITIATIVE END &FIGHT [036]  # ANNOUNCE <ab 02 Dec 2005>
-
-    &TESTSYN3
-        +TO THE END
-    +TO THE DEATH
-    +UNTIL HELL FREEZES OVER
-
-    &TESTSYN4
-    +TO THE END OF THE EARTH
-    +TO THE DEATH
-
-    VOW  [170] ;tony  3/9/91
-    - * RESIST &TESTSYN3 [113] ; pas 4/20/03
-    - * RESIST &TESTSYN4  [115] ; pas 4/20/03
-    - * RESISTANCE TO THE INVADING  [114] ; pas 4/20/03
-    - * RESIST  [112] ;tony  4/29/91
-    - * WAR  [173] ;tony  4/22/91
-
-    PROGRAMMING NOTES
-
-    Notes
-    1.  TABARI allowed recursive synsets -- that is, synsetS embedded in
-    patterns and other synsets. It should be possible to do this fairly easily,
-    at least with basic synsets as elements (not as patterns) but a simple call
-    in syn_match(isupperseq) was not sufficient, so this needs more work.
-
-    2.  For TABARI legacy purposes, the construction "XXXX_ " is converted to
-    "XXXX ", an open match.  However, per the comments below, generally TABARI
-    dictionaries should be converted before being used with PETRARCH.
-
-    3.  The current version of the program cannot deal with multi-word "verbs"
-    -- e.g.  "SHOT_AND_KILLED" -- so these are skipped.
-
-    4. The verb dictionary is stored as follows: [0] True: primary form [1] Code
-    [2:n] 3-lists of multi-words: [code, primary form (use as a pointer to the
-    pattern list, tuple of words -- see store_multi_word_verb(loccode):) [n:]
-    3-lists of lower pattern, upper pattern and code. Upper pattern is stored in
-    reverse order
-
-        [0] False [1]: optional verb-specific code (otherwise use the primary
-        code) [2]: primary form (use as a pointer to the pattern list)
-
-    VERB DICTIONARY DIFFERENCES FROM TABARI
-
-    On the *very* remote chance -- see Note 1 -- that you are trying to modify a
-    TABARI .verbs dictionary to the PETRARCH format, the main thing you will
-    need to eliminate are stemmed words:  PETRARCH only works with complete
-    words. On the positive side, PETRARCH will only look at string as a "verb"
-    if it has been identified as such by the parser -- that is, it is preceded
-    with (VP and a tag that starts with (VB, so the [numerous] patterns required
-    for noun/verb disambiguation are no longer needed. PETRARCH also does not
-    allow disconjunctive sets in patterns: to accommodate legacy dictionaries,
-    patterns containing these are skipped, but in order to work, these should be
-    replaced with synsets. Also see additional remarks at the beginning of the
-    file.
-
-    The other big difference between PETRARCH and TABARI is verb-noun
-    disambiguation: the pattern-based approach of TABARI needed a lot of
-    information to insure that a word that *might* be a verb was, in fact, a
-    verb (or was a noun that occurred in a context where it indicated an event
-    anyway: TABARI's [in]famous tendency to code the right thing for the wrong
-    reason). PETRARCH, in contrast, only looks as a verb when the parsing has
-    identified it as, in fact, a verb. This dramatically reduces false positives
-    and eliminates the need for any pattern which was required simply for
-    disambiguation, but it also means that PETRARCH is a lot more discriminating
-    about what actually constitutes an event. The big difference here is that
-    verb-only codes are the norm in PETRARCH dictionaries but the exception in
-    TABARI dictionaries.
-
-    The active PETRARCH verbs dictionary has been extensively reorganized into
-    both verb and noun synonym sets, and you are probably better off adding
-    vocabulary to this [see Note 1] than converting a dictionary, but it can be
-    done. An unconverted TABARI dictionary, on the other hand, will generally
-    not work particularly well with PETRARCH.
-
-    Note 1.
-
-    Yeah, right. Every project we've encountered -- including those lavishly
-    funded by multiple millions of taxpayers dollars and those allegedly
-    producing multiple millions of events -- has regarded the NSF-funded CAMEO
-    verbs dictionaries as a sacred artifact of the [infamous] Data Fairy,
-    lowered from Asgaard along the lines of this
-
-    http://www.wikiart.org/en/jacob-jordaens/allegory-of-the-peace-of-westphalia-1654
-
-    [not exactly sure where the .verbs file is in that painting, but it must be
-    in there somewhere]
-
-    but then subsequently subject said dictionaries to bitter complaints that
-    they aren't coding comprehensively.
-
-    Look, dudes and dudettes, these dictionaries have been open source for about
-    as long as the US has been at war in Afghanistan -- which is to say, a
-    really long time -- and if you don't like how the coding is being done, add
-    some new open-source vocabulary to the dictionaries instead of merely
-    parasitizing the existing work. Dudes.
-
-    The *real* problem, one suspects, is embodied in the following nugget of
-    wisdom:
-
-    Opportunity is missed by most people because it is dressed in overalls and
-    looks like work.
-    Thomas A. Edison
-
-    Dudes.
-
     """
+
     global theverb, verb  # <14.05.07> : not needed, right?
 
     def make_phrase_list(thepat):
@@ -932,7 +608,7 @@ def read_verb_dictionary(verb_path):
         # need error checking here
         global verb, theverb
         forms = verb[verb.find('{') + 1:verb.find('}')].split()
-        #       print '++',forms
+
         for wrd in forms:
             vscr = wrd + " "
             PETRglobals.VerbDict[vscr] = [False, loccode, theverb]
@@ -946,6 +622,7 @@ def read_verb_dictionary(verb_path):
         """
 
         global verb, theverb
+
         if '{' in verb:
             forms = verb[verb.find('{') + 1:verb.find('}')].split()
             forms.append(verb[:verb.find('{')].strip())
@@ -974,7 +651,10 @@ def read_verb_dictionary(verb_path):
                                                        tuple(multilist)]]
 
     def make_verb_forms(loccode):
-        """ Create the regular forms of a verb. """
+        """
+        Create the regular forms of a verb.
+        """
+
         global verb, theverb
         vroot = verb[:-1]
         vscr = vroot + "S "
@@ -990,7 +670,10 @@ def read_verb_dictionary(verb_path):
         PETRglobals.VerbDict[vscr] = [False, loccode, theverb]
 
     def make_plural(st):
-        """ Create the plural of a synonym noun st """
+        """
+        Create the plural of a synonym noun st
+        """
+
         if 'Y' == st[-1]:
             return st[:-1] + 'IES'  # space is added below
         elif 'S' == st[-1]:
@@ -1015,10 +698,7 @@ def read_verb_dictionary(verb_path):
         else:
             verb = line.strip() + ' '
             code = ''
-# ka += 1 # line count debug
-#       if ka > 32: return
 
-#       print verb, code
         if verb.startswith('---'):  # start of new block
             if len(code) > 0:
                 primarycode = code
@@ -1032,13 +712,11 @@ def read_verb_dictionary(verb_path):
             if '{' in verb:
                 line = read_FIN_line()
                 continue
-#           print 'RVD-1',verb
 # resolve the ambiguous '_ ' construction to ' '
             verb = verb.replace('_ ', ' ')
             targ = verb[1:].partition('*')
             try:
                 highpat = make_phrase_list(targ[0].lstrip())
-                #               print 'RVD-2',highpat
                 highpat.reverse()
                 lowphrase = targ[2].rstrip()
                 if len(lowphrase) == 0:
@@ -1047,7 +725,6 @@ def read_verb_dictionary(verb_path):
                     lowpat = [targ[2][0]]  # start with connector
                     loclist = make_phrase_list(lowphrase[1:])
                     lowpat.extend(loclist[:-1])  # don't need the final blank
-    #           print 'RVD-3',lowpat
                 PETRglobals.VerbDict[theverb].append([highpat, lowpat, code])
             except ValueError:
                 # just trap the error, which will skip the line containing it
@@ -1078,7 +755,6 @@ def read_verb_dictionary(verb_path):
                     PETRglobals.VerbDict[verb].append(wordstr)
                     PETRglobals.VerbDict[verb].append(make_plural(wordstr))
                 line = read_FIN_line()
-#           print "rvd/gs:",verb, PETRglobals.VerbDict[verb]
 
         else:  # verb
             # if theverb != '': print '::', theverb,
@@ -1094,7 +770,6 @@ def read_verb_dictionary(verb_path):
                     theverb = verb[:verb.find('{')].strip() + ' '
                 else:
                     theverb = verb
-#               print '** \"'+theverb+'\"'
                 PETRglobals.VerbDict[theverb] = [True, curcode]
                 newblock = False
             if '_' in verb:
@@ -1108,7 +783,6 @@ def read_verb_dictionary(verb_path):
             #           if ka > 16: return
             line = read_FIN_line()
 
-#       print "--:",line,
     close_FIN()
 
 
@@ -1120,7 +794,7 @@ def show_verb_dictionary(filename=''):
         fout.write('Run time: ' + PETRglobals.RunTimeString + '\n')
 
         for locword, loclist in PETRglobals.VerbDict.items():
-            if locword[0] == '&':  # debug: skip the synsets
+            if locword[0] == '&':
                 continue
             fout.write(locword)
             if loclist[0]:
@@ -1208,7 +882,6 @@ def dstr_to_ordate(datestring):
         dstr_to_ordate("16010101")  # 2305814
     """
 
-    # print datestring        # debug
     try:
         if len(datestring) > 7:
             year = int(datestring[:4])
@@ -1224,7 +897,6 @@ def dstr_to_ordate(datestring):
             day = int(datestring[4:6])
     except ValueError:
         raise DateError
-# print year, month, day    # debug
 
     if day <= 0:
         raise DateError
@@ -1242,10 +914,10 @@ def dstr_to_ordate(datestring):
         else:
             if day > 28:
                 raise DateError
-    elif month in [4, 6, 9, 11]:  # 30 days have September...
+    elif month in [4, 6, 9, 11]:
         if day > 30:
             raise DateError
-    else:  # all the rest I don't remember...
+    else:
         if day > 31:
             raise DateError
 
@@ -1277,99 +949,6 @@ def read_actor_dictionary(actorfile):
     <14.02.26: Except at the moment these are just 2-item lists, not tuples, but
     this could be easily changed and presumably would be more efficient: these
     are not changed so they don't need to be lists.<>
-
-    Connector: blank: words can occur between the previous word and the next
-    word _ (underscore): words must be consecutive: no intervening words
-
-    The codes with possible date restrictions are stored as lists in a [genuine]
-    tuple in PETRglobals.ActorCodes in the following format where 'ordate' is an
-    ordinal date:
-        [code] : unrestricted code
-        [0,ordate,code] : < restriction
-        [1,ordate,code] : > restriction
-        [2,ordate,ordate, code] : - (interval) restriction
-    If PETRglobals.WriteActorRoot is True, the final element of a
-    PETRglobals.ActorCodes list is the text of the actor at the beginning of the
-    synonym list.
-
-    Synonyms simply use the integer code index to point to these tuples.
-
-    STRICT FORMATTING OF THE ACTOR DICTIONARY
-    [With some additional coding, this can be relaxed, but anything following
-    these rules should read correctly]
-    Basic structure is a series of records of the form
-        [primary phrase]
-        [optional synonym phrases beginning with '+']
-        [optional date restrictions beginning with '\t']
-
-    Material that is ignored
-    1. Anything following ';' (this is the old KEDS/TABARI format and should
-        probably be replaced with '#' for consistency
-    2. Any line beginning with '#' or <!
-    3. Any null line (that is, line consisting of only \n
-
-    A "phrase string" is a set of character strings separated by either blanks
-    or underscores.
-
-    A "code" is a character string without blanks
-
-    A "date" has the form YYYYMMDD or YYMMDD. These can be mixed, e.g.
-        JAMES_BYRNES_  ; CountryInfo.txt
-            [USAELI 18970101-450703]
-            [USAGOV 450703-470121]
-
-    Primary phrase format:
-    phrase_string  { optional [code] }
-        if the code is present, it becomes the default code if none of the date
-        restrictions are satisfied. If it is not present and none of the
-        restrictions are satisfied, this is equivalent to a null code
-
-    Synonym phrase
-    +phrase_string
-
-    Date restriction
-    \t[code restriction]
-    where restriction -- everything is interpret as 'or equal' -- takes the form
-    <date : applies to times before date
-    >date : applies to times after date
-    date-date: applies to times between dates
-
-    A date restriction of the form
-    \t[code]
-    is the same as a default restriction.
-
-
-    == Example ===
-    # .actor file produced by translate.countryinfo.pl from
-    # CountryInfo.120106.txt
-    # Generated at: Tue Jan 10 14:09:48 2012
-    # Version: CountryInfo.120106.txt
-
-    AFGHANISTAN_  [AFG]
-    +AFGHAN_
-    +AFGANISTAN_
-    +AFGHANESTAN_
-    +AFGHANYSTAN_
-    +KABUL_
-    +HERAT_
-
-    MOHAMMAD_ZAHIR_SHAH_  ; CountryInfo.txt
-        [AFGELI 320101-331108]
-        [AFGGOV 331108-730717]
-        [AFGELI 730717-070723]
-
-    ABDUL_QADIR_  ; CountryInfo.txt
-    +NUR_MOHAMMAD_TARAKI_  ; CountryInfo.txt
-    +HAFIZULLAH_AMIN_  ; CountryInfo.txt
-        [AFGELI 620101-780427]
-        [AFGGOV 780427-780430]
-        [AFGELI]
-
-    HAMID_KARZAI_  [AFGMIL]; CountryInfo.txt
-    +BABRAK_KARMAL_  ; CountryInfo.txt
-    +SIBGHATULLAH_MOJADEDI_  ; CountryInfo.txt
-        [AFGGOV 791227-861124]
-        [AFGGOV 791227-810611]
     """
 
     dateerrorstr = ("String in date restriction could not be interpreted; "
@@ -1389,7 +968,6 @@ def read_actor_dictionary(actorfile):
         if '---STOP---' in line:
             break
         if line[0] == '\t':  # deal with date restriction
-            # print "DR:",line,   # debug
             try:
                 brack = line.index('[')
             except ValueError:
@@ -1445,22 +1023,15 @@ def read_actor_dictionary(actorfile):
 
         else:
             if line[0] == '+':  # deal with synonym
-                # print "Syn:",line,
                 part = line.partition(';')  # split on comment, if any
                 actor = part[0][1:].strip() + ' '
             else:  # primary phrase with code
                 if len(curlist) > 0:
                     if PETRglobals.WriteActorRoot:
                         curlist.append(rootactor)
-#                    print(curlist)
                     PETRglobals.ActorCodes.append(
                         tuple(curlist)
                     )  # store code from previous entry
-                    """print(PETRglobals.ActorCodes[-1])
-                    thelist = PETRglobals.ActorCodes[-1]
-                    for item in thelist:
-                        if not isinstance(item,list):
-                            print('== Actor',item)"""
                     codeindex = len(PETRglobals.ActorCodes)
                     curlist = []
                 if '[' in line:  # code specified?
@@ -1534,85 +1105,6 @@ def read_agent_dictionary(agent_path):
     Connector:
             blank: words can occur between the previous word and the next word
             _ (underscore): words must be consecutive: no intervening words
-
-    FORMATTING OF THE AGENT DICTIONARY
-    [With some additional coding, this can be relaxed, but anything following
-    these rules should read correctly] Basic structure is a series of records of
-    the form
-            phrase_string {optional plural}  [agent_code]
-
-    Material that is ignored
-    1. Anything following '#'
-    2. Any line beginning with '#' or '<!'
-    3. Any null line (that is, line consisting of only \n
-
-    A "phrase string" is a set of character strings separated by either blanks
-    or underscores.
-
-    A "agent_code" is a character string without blanks that is either preceded
-    (typically) or followed by '~'. If the '~' precedes the code, the code is
-    added after the actor code; if it follows the code, the code is added before
-    the actor code (usually done for organizations, e.g. NGO~)
-
-    Plurals:
-            Regular plurals -- those formed by adding 'S' to the root, adding
-            'IES' if the root ends in 'Y', and added 'ES' if the root ends in
-            'SS' -- are generated automatically
-
-            If the plural has some other form, it follows the root inside {...}
-
-            If a plural should not be formed -- that is, the root is only
-            singular or only plural, or the singular and plural have the same
-            form (e.g. "police"), use a null string inside {}.
-
-            If there is more than one form of the plural -- "attorneys general"
-            and "attorneys generals" are both in use -- just make a second entry
-            with one of the plural forms nulled (though in this instance --
-            ain't living English wonderful? -- you could null the singular and
-            use an automatic plural on the plural form) Though in a couple test
-            sentences, this phrase confused SCNLP.
-
-    Substitution Markers:
-            These are used to handle complex equivalents, notably
-
-                    !PERSON! = MAN, MEN, WOMAN, WOMEN, PERSON
-                    !MINST! = MINISTER, MINISTERS, MINISTRY, MINISTRIES
-
-            and used in the form
-
-                    CONGRESS!PERSON! [~LEG]
-                    !MINIST!_OF_INTERNAL_AFFAIRS
-
-            The marker for the substitution set is of the form !...! and is
-            followed by an = and a comma-delimited list; spaces are stripped
-            from the elements of the list so these can be added for clarity.
-            Every time in the list is substituted for the marker, with no
-            additional plural formation, so the first construction would
-            generate
-
-                    CONGRESSMAN [~LEG]
-                    CONGRESSMEN [~LEG]
-                    CONGRESSWOMAN [~LEG]
-                    CONGRESSWOMEN [~LEG]
-                    CONGRESSPERSON [~LEG]
-
-    == Example ===
-    <!-- PETRARCH VALIDATION SUITE AGENTS DICTIONARY -->
-    <!-- VERSION: 0.1 -->
-    <!-- Last Update: 27 November 2013 -->
-
-    PARLIAMENTARY_OPPOSITION {} [~OPP] #jap 11 Oct 2002
-    AMBASSADOR [~GOV] # LRP 02 Jun 2004
-    COPTIC_CHRISTIAN [~CHRCPT] # BNL 10 Jan 2002
-    FOREIGN_MINISTER [~GOVFRM] # jap 4/14/01
-    PRESIDENT [~GOVPRS] # ns 6/26/01
-    AIR_FORCE {} [~MIL] # ab 06 Jul 2005
-    OFFICIAL_MEDIA {} [~GOVMED] # ab 16 Aug 2005
-    ATTORNEY_GENERAL {ATTORNEYS_GENERAL} [~GOVATG] # mj 05 Jan 2006
-    FOREIGN_MINISTRY [~GOV] # mj 17 Apr 2006
-    HUMAN_RIGHTS_ACTIVISTS  [NGM~] # ns 6/14/01
-    HUMAN_RIGHTS_BODY  [NGO~] # BNL 07 Dec 2001
-    TROOP [~MIL] # ab 22 Aug 2005
     """
     global subdict
 
@@ -1639,12 +1131,10 @@ def read_agent_dictionary(agent_path):
             return
         ka = line.find('!') + 1
         marker = line[ka:line.find('!', ka)]
-        # print marker
         loclist = line[line.find('=', ka) + 1:].strip()
         subdict[marker] = []
         for item in loclist.split(','):
             subdict[marker].append(item.strip())
-# print subdict[marker]
 
     def store_marker(agent, code):
         global subdict
@@ -1712,7 +1202,6 @@ def read_agent_dictionary(agent_path):
             else:
                 plural = agent[:-1] + 'S'
 
-# print agent,plural
         store_agent(agent, code)
         if len(plural) > 0:
             store_agent(plural + ' ', code)

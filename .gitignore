@@ -1,5 +1,7 @@
 *.pyc
 *.swp
+*.log
+*.egg-info
 .DS_Store
 .ropeproject
 petrarch_app.py
