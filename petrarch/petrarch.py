@@ -149,7 +149,28 @@ def raise_ParseList_error(call_location_string):
     """
     Handle problems found at some point during the coding/evaluation of
     ParseList, and is called when the problem seems sufficiently important that
-    the record should not be coded.  Logs the error and raises HasParseError.
+    the record should not be coded. Logs the error.
+
+    Parameters
+    ----------
+
+    call_location_string: String.
+                           Contains explanation of the error thrown.
+
+    Globals
+    ----------
+
+    SentenceID: String.
+                 Global variable containing ID line.
+
+    ValidError: String.
+                 Global variable containing the actual error.
+
+    Raises
+    ------
+
+    HasParseError: Class.
+                    Exits coding due to parsing error.
     """
     global SentenceID, ValidError
     warningstr = call_location_string + ('; record skipped:'
@@ -164,6 +185,19 @@ def raise_ParseList_error(call_location_string):
 def show_tree_string(sent):
     """
     Indexes the () or (~in a string tree and prints as an indented list.
+
+    Parameters
+    ----------
+
+    sent: String.
+          Uppercased sentence generated from SentenceText.upper().
+
+    Raises
+    ------
+
+    HasParseError: Class.
+                    Raises error if number of open and closed parentheses are
+                    not equal and PETRglobals.StoponError.
     """
     # show_tree_string() also prints the totals
     # call with ' '.join(list) to handle the list versions of the string
@@ -214,6 +248,13 @@ def check_balance():
     """
     Check the (/~ count in a ParseList and raises UnbalancedTree if it is not
     balanced.
+
+    Raises
+    ------
+
+    UnbalancedTree: Class.
+                     Raises error if number of open and closed parentheses are
+                     not equal.
     """
     nopen = 0
     nclose = 0
@@ -233,6 +274,20 @@ def check_balance():
 def change_Config_Options(line):
     """
     Changes selected configuration options.
+
+    Parameters
+    ----------
+
+    line: Dictionary.
+           A dictionary from an item element in sents. Gets called in
+           do_validation(filepath). sents = root.find('Sentences').
+
+    Raises
+    ------
+
+    ValueError: Class.
+                 Exception thrown when new_actor_length or comma_* isn't an
+                 integer.
     """
     # need more robust error checking
     theoption = line['option']
@@ -279,12 +334,45 @@ def change_Config_Options(line):
 
 def evaluate_validation_record(item):
     """
-    Read validation record, setting EventID and a list of correct coded events,
-    code using read_TreeBank(), then check the results. Returns True if the
-    lists of coded and expected events match or the event is skipped; false
-    otherwise; also prints the mismatches.  Raises EOFError exception if EOF
-    hit. Raises SkipRecord if <Skip> found or record is skipped due to
-    In/Exclude category lists
+    Read validation record, setting EventID and a list of correctly coded
+    events, code using read_TreeBank(), then check the results. Prints the
+    mismatches.
+
+    Parameters
+    ----------
+
+    item: Element.
+           An xml element instance for an item in sents.
+
+    Globals
+    -------
+
+    # TODO: This function modifies a ton of globals. Need to figure out the best
+            way to document this.
+
+    Returns
+    -------
+
+    Boolean.
+     True if the lists of coded and expected events match or the event is
+     skipped; false otherwise.
+
+    Defines
+    -------
+
+    extract_EventCoding_info(codings)
+
+    Raises
+    ------
+
+    raise_ParseList_error: Function.
+                            If check_commas() throws an IndexError, a string is
+                            passed to this function, which ultimately throws
+                            HasParseError
+
+    SkipRecord: Class.
+                 If <Skip> found or record is skipped due to In/Exclude category
+                 lists.
     """
     global SentenceDate, SentenceID, SentenceCat, SentenceText, SentenceValid
     global CodedEvents, ValidEvents, ValidError, ValidErrorType
@@ -295,10 +383,29 @@ def evaluate_validation_record(item):
 
     def extract_EventCoding_info(codings):
         """
-        Extracts fields from <EventCoding record and appends to ValidEvents.
-        Structure of ValidEvents
-        noevents: empty list
-        otherwise list of triples of [sourcecode, targetcode, eventcode]
+        Extracts fields from EventCoding record and appends the event triple,
+        [sourcecode, targetcode, eventcode] to the ValidEvents global. Appends
+        empty list if no events.
+
+        Parameters
+        ----------
+
+        codings: List.
+                  List of strings from item that contain 'EventCoding'.
+
+        Globals
+        --------
+
+        ValidEvents: List.
+                      Global variable containing valid event triples.
+
+        ValidErrorType: String.
+                         The expected error code.
+
+        Returns
+        -------
+
+        None
         """
         # currently does not raise errors if the information is missing but
         # instead sets the fields to null strings
@@ -408,7 +515,7 @@ def evaluate_validation_record(item):
                     print('\t' + st, end='')
                 else:
                     print('\t---', end='')
-            print()
+            int()
 
     if (len(ValidEvents) == 0) and (len(CodedEvents) == 0):
         return True  # noevents option
@@ -444,11 +551,23 @@ def evaluate_validation_record(item):
 
 def open_validation_file(xml_root):
     """
-    1. Opens validation file TextFilename as FIN
-    2. After "</Environment>" found, closes FIN, opens ErrorFile, sets various
-    validation options, then reads the dictionaries (exits if these are not set)
-    3. Can raise MissingXML
-    4. Can exit on EOFError
+    Opens validation file TextFilename as FIN. After "</Environment>" found,
+    closes FIN, opens ErrorFile, sets various validation options, then reads the
+    dictionaries (exits if these are not set).
+
+    Parameters
+    ----------
+
+    xml_root: Element.
+               An xml element at the root of the tree.
+
+    Raises
+    ------
+
+    # TODO:
+    MissingXML
+
+    Can exit on EOFError
     """
     global ValidInclude, ValidExclude, ValidPause, ValidOnly
     logger = logging.getLogger('petr_log')
@@ -509,6 +628,31 @@ def open_validation_file(xml_root):
 
 
 def _check_envr(environ):
+    """
+    Sets up the validation environment using the contents of xml_root.
+
+    Parameters
+    ----------
+
+    environ: Element.
+              An xml element instance returned by xml_root.find('Environment').
+
+    Returns
+    -------
+
+    ValidInclude: List.
+                   Validation mode: list of categories to include.
+
+    ValidExclude: List.
+                   Validation mode: list of categories to exclude.
+
+    ValidPause: Integer.
+                 Validation mode: pause conditions: 1: always; -1 never; 0 only
+                 on error (default).
+
+    ValidOnly: Boolean.
+                Only evaluate cases where <Sentence valid="true">
+    """
     for elem in environ:
         if elem.tag == 'Verbfile':
             PETRglobals.VerbFileName = elem.text
@@ -558,15 +702,57 @@ def _check_envr(environ):
 
 def read_TreeBank():
     """
-    Reads parsed sentence in the Penn TreeBank II format and puts the linearized
-    version in the list ParseList. Sets ParseStart. Leaves global input file fin
-    at line following </parse>. The routine is appears to be agnostic towards
-    the line-feed and tab formatting of the parse tree
+    Reads parsed sentence in the Penn TreeBank II format. Leaves global input
+    file fin at line following </parse>.
 
-    TO DO <14.09.03>: Does this handle an unexpected EOF error?
+    Globals
+    -------
 
-    TO DO <14.09.03>: This really belongs as a separate module and the code
-    seems sufficiently stable now that this could be done
+    ParseList: List.
+                Linearized version of parse tree. Put here by read_TreeBank().
+
+    ParseStart: Integer
+                 First element to check (skips (ROOT, initial (S. Set to 0 by
+                 default. Set to 2 later in this function.
+
+    treestr: String.
+              A formatted stringi version of the parse tree set by
+              utilities._format_parsed_str(parsed).
+
+    fullline: String.
+               Initialized as empty string.
+
+    ncindex: Integer.
+              A counter for that increments if treestr starts with '(NEC '.
+              Initialized at 1.
+
+    Defines
+    -------
+
+    check_irregulars(knownerror='')
+
+    get_NE(NPphrase)
+
+    get_forward_bounds(ka)
+
+    get_enclosing_bounds(ka)
+
+    mark_compounds()
+
+    resolve_compounds(ka)
+
+    reduce_SBAR(kstart)
+
+    process_preposition(ka)
+
+    filter_treestr()
+
+    Raises
+    ------
+
+    UnbalancedTree: Class.
+                     If check_balance() throws an unbalanced tree exception it
+                     runs: check_irregulars('bad_final_parse').
     """
 
     global ParseList, ParseStart
@@ -578,8 +764,8 @@ def read_TreeBank():
         """
         Checks for some known idiosyncratic ParseList patterns that indicate
         problems in the the input text or, if knownrecord != '', just raises an
-        already detected error. In either case, logs the specific issue, sets
-        the global ValidError (for unit tests) and raises IrregularPattern.
+        already detected error.
+
         Currently tracking:
            -- bad_input_parse
            -- empty_nplist
@@ -589,6 +775,27 @@ def read_TreeBank():
            -- resolve_compounds
            -- get_NE_error
            -- dateline [pattern]
+
+       Parameters
+       ----------
+
+       knownerror: String.
+                    Set to empty string by default. Compared to error strings
+                    and logged if equal. Sets the global ValidError for unit
+                    tests.
+
+       Globals
+       -------
+
+       ValidError: String.
+                    The actual error code.
+
+       Raises
+       ------
+
+       IrregularPattern: Class.
+                          Raised if knownerror. Problems were found at some
+                          point in read_TreeBank.
        """
         global ValidError
         if knownerror:
@@ -642,8 +849,28 @@ def read_TreeBank():
     def get_NE(NPphrase):
         """
         Convert (NP...) ) to NE: copies any (NEC phrases with markup, remainder
-        of the phrase without any markup Can raise IrregularPattern, which is
-        caught and re-raised at the calling point
+        of the phrase without any markup.
+
+        Parameters
+        ----------
+
+        NPphrase: String.
+                   # TODO: Pretty sure this is the entire noun phrase from
+                   # treestr (which is the parse tree as a single string).
+
+        Returns
+        -------
+
+        nplist: List.
+                 A list of the noun phrase contents as individual strings.
+
+        Raises
+        ------
+
+        IrregularPattern: Class.
+                           Raised if ka >= len(seg). ka is a counter and seg is
+                           a list of strings from NPphrase.Problems were found
+                           at some point in read_TreeBank.
         """
         nplist = ['(NE --- ']
         seg = NPphrase.split()
@@ -682,6 +909,25 @@ def read_TreeBank():
         """
         Returns the bounds of a phrase in treestr that begins at ka, including
         the final space.
+
+        Parameters
+        ----------
+
+        ka: Integer.
+             The front bound of the phrase.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed).
+
+        Returns
+        -------
+
+        List.
+         Contains the beginning location (ka) and the end location (kb).
         """
         global treestr  # <13.12.07> see note above
         kb = ka + 1
@@ -699,8 +945,27 @@ def read_TreeBank():
 
     def get_enclosing_bounds(ka):
         """
-        Returns the bounds of a phrase in treestr that encloses the phrase
-        beginning at ka
+        Gets the bounds of a phrase in the tree that encloses the phrase
+        beginning of ka.
+
+        Paramaters
+        ----------
+
+        ka: Integer.
+             The front bound of the phrase.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed).
+
+        Returns
+        -------
+
+        List.
+         The bounds of a phrase.
         """
         global treestr  # <13.12.07> see note above
         kstart = ka - 1
@@ -719,7 +984,14 @@ def read_TreeBank():
         """
         Determine the inner-most phrase of each CC and mark: -- NEC: compound
         noun phrase for (NP tags -- CCP: compound phrase for (S and (VP tags
-        [possibly add (SBAR to this?] otherwise just leave as CC
+        [possibly add (SBAR to this?] otherwise just leave as CC.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed).
         """
         global treestr
 
@@ -760,6 +1032,37 @@ def read_TreeBank():
         """
         Assign indices, eliminates the internal commas and (CC, and duplicate
         any initial adjectives inside a compound.
+
+        Parameters
+        ----------
+
+        ka: Integer.
+             The front bound of the phrase.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed).
+
+        fullline: String.
+                   Initialized as empty string. # TODO: Finish this
+
+        Returns
+        -------
+
+        Integer.
+         necbds[1] + 1 # TODO: This is the nec bounds + 1?
+
+        Raises
+        ------
+
+        IrregularPattern: Class.
+                           Raised if Pnplist =
+                           get_NE(treestr[npbds[0]:npbds[1]]) throws an
+                           exception. Problems were found at some point in
+                           read_TreeBank.
         """
         global treestr, fullline
 
@@ -809,8 +1112,22 @@ def read_TreeBank():
 
     def reduce_SBAR(kstart):
         """
-        Collapse SBAR beginning at kstart to a string without any markup; change
-        clause marker to SBR, which is subsequently eliminated
+        Collapses subordinating conunction (SBAR) beginning at kstart to a
+        string without any markup; change clause marker to SBR, which is
+        subsequently eliminated.
+
+        Parameters
+        ----------
+
+        kstart: Integer.
+                 Location in string from which to start the collapse.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed). Modified to include SBR.
         """
         global treestr
 
@@ -833,13 +1150,36 @@ def read_TreeBank():
 
     def process_preposition(ka):
         """
-        Process (NP containing a (PP and return an nephrase: if this doesn't
-        have a simple structure of  (NP (NP ...) (PP...) (NP/NEC ...)) without
-        any further (PP -- i.e. multiple levels of prep phrases -- it returns a
-        null string.
+        Process (NP containing a (PP and return an nephrase.
+
+        Parameters
+        ----------
+
+        ka: Integer.
+             The front bound of the phrase.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed).
+
+        ncindex: Integer.
+                  A counter for that increments if treestr starts with '(NEC '.
+                  Initialized at 1.
+
+        Returns
+        -------
+
+        nepph or '': String.
+                      An nephrase or if it doesn't have a simple structure of
+                      (NP (NP ...) (PP...) (NP/NEC ...)) without any further (PP
+                      -- i.e. multiple levels of prep phrases -- it returns a
+                      null string.
         """
 
-        global treestr, ncindex
+        global treestr, ncindex # not entirely sure why ncindex gets called here
 
         bds = get_enclosing_bounds(ka)  # this should be a (NP (NP
         if treestr.startswith('(NP (NP', bds[0]):
@@ -871,7 +1211,7 @@ def read_TreeBank():
             kb = kec
         npbds = get_forward_bounds(kb)
         if '(PP' in treestr[npbds[0]:npbds[1]]:
-            return ('')
+            return ''
             # there's another level of (PP here  <14.04.21: can't we just
             # reduce this per (SBR?
         # leave the (NEC in place. <14.01.15> It should be possible to add an
@@ -892,7 +1232,15 @@ def read_TreeBank():
 
     def filter_treestr():
         """
-        Filters known problematic strings in treestr
+        Filters known problematic strings in treestr.
+
+        Globals
+        -------
+
+        treestr: String.
+                  A formatted string version of the parse tree set by
+                  utilities._format_parsed_str(parsed). Modified here to deal
+                  with problematic tildas.
         """
         global treestr
         if '~' in treestr:
@@ -1037,16 +1385,49 @@ def read_TreeBank():
 def get_loccodes(thisloc):
     """
     Returns the list of codes from a compound, or just a single code if not
-    compound
+    compound. Extracting noun phrases which are not in the dictionary: If no
+    actor or agent generating a non-null code can be found using the
+    source/target rules, PETRARCH can output the noun phrase in double-quotes.
+    This is controlled by the configuration file option new_actor_length, which
+    is set to an integer which gives the maximum length for new actor phrases
+    extracted. If this is set to zero [default], no extraction is done and the
+    behavior is the same as TABARI. Setting this to a large number will extract
+    anything found in a (NP noun phrase, though usually true actors contain a
+    small number of words.
 
-    Extracting noun phrases which are not in the dictionary: If no actor or
-    agent generating a non-null code can be found using the source/target rules,
-    PETRARCH can output the noun phrase in double-quotes. This is controlled by
-    the configuration file option new_actor_length, which is set to an integer
-    which gives the maximum length for new actor phrases extracted. If this is
-    set to zero [default], no extraction is done and the behavior is the same as
-    TABARI. Setting this to a large number will extract anything found in a (NP
-    noun phrase, though usually true actors contain a small number of words.
+    Paramaters
+    ----------
+
+    thisloc: List.
+              Either SourceLoc or TargetLoc list of structure:
+                  [0]: the location in *Seq where the NE begins
+                  [1]: True - located in UpperSeq, otherwise in LowerSeq
+
+    Globals
+    -------
+
+    # TODO: UpperSeq, LowerSeq, codelist, StoryEventList
+
+    Defines
+    -------
+
+    get_ne_text(neloc, isupperseq)
+
+    add_code(neloc, isupperseq)
+
+    Raises
+    ------
+
+    IndexError: Exception.
+                 Calls raise_ParseList_error(), passing a string which logs
+                 whether the error was in UpperSeq or LowerSeq.
+
+    Returns
+    -------
+
+    codelist: List.
+               Multiple codes if a compound or single code if not. This is a
+               global variable.
     """
     global UpperSeq, LowerSeq, codelist, StoryEventList
 
@@ -1054,7 +1435,23 @@ def get_loccodes(thisloc):
 
     def get_ne_text(neloc, isupperseq):
         """
-        Returns the text of the phrase from UpperSeq/LowerSeq starting at neloc.
+        Gets the text from the NE.
+
+        Parameters
+        ----------
+
+        neloc: Integer.
+                The phrase bound.
+
+        isupperseq: Boolean.
+                     Determines wheter function uses UperSeq or LowerSeq global.
+                     True if text matched prior to verb.
+
+        Returns
+        -------
+
+        acphr: String.
+                The text of the phrase from UpperSeq/LowerSeq starting at neloc.
         """
         if isupperseq:
             acphr = UpperSeq[neloc - 1]
@@ -1076,10 +1473,19 @@ def get_loccodes(thisloc):
     def add_code(neloc, isupperseq):
         """
         Appends the code or phrase from UpperSeq/LowerSeq starting at neloc.
-        isupperseq determines the choice of sequence
+        isupperseq determines the choice of sequence. If
+        PETRglobals.WriteActorText is True, root phrase is added to the code
+        following the string PETRglobals.TextPrimer.
 
-        If PETRglobals.WriteActorText is True, root phrase is added to the code
-        following the string PETRglobals.TextPrimer
+        Parameters
+        ----------
+
+        neloc:
+
+        isupperseq:
+
+        Globals
+        -------
         """
         global UpperSeq, LowerSeq, codelist
 
@@ -2845,10 +3251,7 @@ def run(filepaths, out_file, s_parsed):
     PETRwriter.write_events(updated_events, out_file)
 
 
-def run_pipeline(data,
-                 out_file=None,
-                 config=None,
-                 write_output=True,
+def run_pipeline(data, out_file=None, config=None,write_output=True,
                  parsed=False):
     utilities.init_logger('PETRARCH.log')
     logger = logging.getLogger('petr_log')
