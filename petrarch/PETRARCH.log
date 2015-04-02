@@ -1,16 +1,16 @@
-INFO 2015-03-27 17:52:19,880: Running
-INFO 2015-03-27 17:52:19,988: Validation file: data/text/GigaWord.sample.PETR.xml
+INFO 2015-04-01 23:00:05,410: Running
+INFO 2015-04-01 23:00:05,597: Validation file: data/text/GigaWord.sample.PETR.xml
 Verbs file: PETR.Validate.verbs.txt
 Actors file: PETR.Validate.actors.txt
 Agents file: PETR.Validate.actors.txt
 
-INFO 2015-03-27 17:52:19,988: Discard file: PETR.Validate.discards.txt
+INFO 2015-04-01 23:00:05,597: Discard file: PETR.Validate.discards.txt
 
-INFO 2015-03-27 17:52:19,988: Reading PETR.Validate.verbs.txt
-INFO 2015-03-27 17:52:20,006: Reading /Users/caseyhilland/petrarch/petrarch/data/dictionaries/PETR.Validate.actors.txt
-INFO 2015-03-27 17:52:20,011: Reading PETR.Validate.agents.txt
+INFO 2015-04-01 23:00:05,597: Reading PETR.Validate.verbs.txt
+INFO 2015-04-01 23:00:05,643: Reading /Users/caseyhilland/petrarch/petrarch/data/dictionaries/PETR.Validate.actors.txt
+INFO 2015-04-01 23:00:05,665: Reading PETR.Validate.agents.txt
 
-INFO 2015-03-27 17:52:20,031: Reading PETR.Validate.discards.txt
-WARNING 2015-03-27 17:52:20,464: Dateline pattern found in ParseList; record skipped: ERROR-01
-WARNING 2015-03-27 17:52:20,464: <Parse>...</Parse> input was not balanced; 
-WARNING 2015-03-27 17:52:20,464: <Parse>...</Parse> input was not balanced; 
+INFO 2015-04-01 23:00:05,686: Reading PETR.Validate.discards.txt
+WARNING 2015-04-01 23:00:06,084: Dateline pattern found in ParseList; record skipped: ERROR-01
+WARNING 2015-04-01 23:00:06,084: <Parse>...</Parse> input was not balanced; 
+WARNING 2015-04-01 23:00:06,085: <Parse>...</Parse> input was not balanced; 

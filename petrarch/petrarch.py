@@ -157,8 +157,9 @@ def raise_ParseList_error(call_location_string):
     call_location_string: String.
                            Contains explanation of the error thrown.
 
-    Globals
-    ----------
+    Notes
+    -----
+    The following globals are used here:
 
     SentenceID: String.
                  Global variable containing ID line.
@@ -344,8 +345,9 @@ def evaluate_validation_record(item):
     item: Element.
            An xml element instance for an item in sents.
 
-    Globals
-    -------
+    Notes
+    -----
+    The following globals ar used here:
 
     # TODO: This function modifies a ton of globals. Need to figure out the best
             way to document this.
@@ -357,8 +359,8 @@ def evaluate_validation_record(item):
      True if the lists of coded and expected events match or the event is
      skipped; false otherwise.
 
-    Defines
-    -------
+    See Also
+    --------
 
     extract_EventCoding_info(codings)
 
@@ -368,7 +370,7 @@ def evaluate_validation_record(item):
     raise_ParseList_error: Function.
                             If check_commas() throws an IndexError, a string is
                             passed to this function, which ultimately throws
-                            HasParseError
+                            HasParseError.
 
     SkipRecord: Class.
                  If <Skip> found or record is skipped due to In/Exclude category
@@ -393,8 +395,9 @@ def evaluate_validation_record(item):
         codings: List.
                   List of strings from item that contain 'EventCoding'.
 
-        Globals
-        --------
+        Notes
+        -----
+        The following globals are used here:
 
         ValidEvents: List.
                       Global variable containing valid event triples.
@@ -705,8 +708,9 @@ def read_TreeBank():
     Reads parsed sentence in the Penn TreeBank II format. Leaves global input
     file fin at line following </parse>.
 
-    Globals
-    -------
+    Notes
+    -----
+    The following globals are used here:
 
     ParseList: List.
                 Linearized version of parse tree. Put here by read_TreeBank().
@@ -726,8 +730,8 @@ def read_TreeBank():
               A counter for that increments if treestr starts with '(NEC '.
               Initialized at 1.
 
-    Defines
-    -------
+    See Also
+    --------
 
     check_irregulars(knownerror='')
 
@@ -784,8 +788,9 @@ def read_TreeBank():
                     and logged if equal. Sets the global ValidError for unit
                     tests.
 
-       Globals
-       -------
+       Notes
+       -----
+       The following globals are used here:
 
        ValidError: String.
                     The actual error code.
@@ -916,8 +921,9 @@ def read_TreeBank():
         ka: Integer.
              The front bound of the phrase.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -954,8 +960,9 @@ def read_TreeBank():
         ka: Integer.
              The front bound of the phrase.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -986,8 +993,9 @@ def read_TreeBank():
         noun phrase for (NP tags -- CCP: compound phrase for (S and (VP tags
         [possibly add (SBAR to this?] otherwise just leave as CC.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -1039,8 +1047,9 @@ def read_TreeBank():
         ka: Integer.
              The front bound of the phrase.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -1122,8 +1131,9 @@ def read_TreeBank():
         kstart: Integer.
                  Location in string from which to start the collapse.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -1158,8 +1168,9 @@ def read_TreeBank():
         ka: Integer.
              The front bound of the phrase.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following global are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -1234,8 +1245,9 @@ def read_TreeBank():
         """
         Filters known problematic strings in treestr.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals are used here:
 
         treestr: String.
                   A formatted string version of the parse tree set by
@@ -1403,13 +1415,14 @@ def get_loccodes(thisloc):
                   [0]: the location in *Seq where the NE begins
                   [1]: True - located in UpperSeq, otherwise in LowerSeq
 
-    Globals
-    -------
+    Notes
+    -----
+    The following globals are used here:
 
     # TODO: UpperSeq, LowerSeq, codelist, StoryEventList
 
-    Defines
-    -------
+    See Also
+    --------
 
     get_ne_text(neloc, isupperseq)
 
@@ -1480,12 +1493,27 @@ def get_loccodes(thisloc):
         Parameters
         ----------
 
-        neloc:
+        neloc: Integer.
+                The phrase bound.
 
-        isupperseq:
+        isupperseq: Boolean.
+                     Determines whether function uses UperSeq or LowerSeq global.
+                     True if text matched prior to verb.
 
-        Globals
-        -------
+        Notes
+        -----
+        The following globals get used here:
+
+        UpperSeq: List.
+                   Text that can be matched prior to the verb; this is stored in
+                   reverse order.
+
+        LowerSeq: List.
+                   Text that can be matched following the verb.
+
+        codelist: List.
+                   Multiple codes if a compound or single code if not. This is a
+                   global variable.
         """
         global UpperSeq, LowerSeq, codelist
 
@@ -1559,10 +1587,27 @@ def get_loccodes(thisloc):
 def find_source():
     """
     Assign SourceLoc to the first coded or compound (NE in the UpperSeq; if
-    neither found then first (NE with --- code Note that we are going through
+    neither found then first (NE with --- code. Note that we are going through
     the sentence in normal order, so we go through UpperSeq in reverse order.
     Also note that this matches either (NE and (NEC: these are processed
     differently in make_event_string()
+
+    Notes
+    -----
+    The following globals get used here:
+
+    UpperSeq: List.
+               Text that can be matched prior to the verb; this is stored in
+               reverse order.
+
+    SourceLoc: Integer.
+                Location of the source within the Upper/LowerSeq. Set to 0 at
+                run. This function changes it to a list of form: [kseq, True].
+
+    Returns
+    -------
+
+    None
     """
     global UpperSeq, SourceLoc
 
@@ -1587,7 +1632,27 @@ def find_source():
 
 def find_target():
     """
-    Assigns TargetLoc
+    Assigns TargetLoc.
+
+    Notes
+    -----
+    The following globals get used here:
+
+    UpperSeq: List.
+               Text that can be matched prior to the verb; this is stored in
+               reverse order.
+
+    LowerSeq: List.
+               Text that can be matched following the verb.
+
+    SourceLoc: Integer.
+                Location of the source within the Upper/LowerSeq. Set to 0 at
+                run.
+
+    TargetLoc: Integer.
+                Location of the target within the Upper/LowerSeq. Set to 0 at
+                run. This function changes it to a list of form: [kseq, True] or
+                [kseq, False].
 
     Priorities for assigning target:
         1. first coded (NE in LowerSeq that does not have the same code as
@@ -1649,6 +1714,39 @@ def get_upper_seq(kword):
     """
     Generate the upper sequence starting from kword; Upper sequence currently
     terminated by ParseStart, ~S or ~,
+
+    Parameters
+    ----------
+
+    kword: Integer.
+            Location in ParseList where the upper sequence generation is
+            started. A loop counts this down in increments of 1.
+
+    Notes
+    -----
+    The following globals get used here:
+
+    ParseList: List.
+                Linearized version of parse tree.
+
+    ParseStart: Integer.
+                 First element to check (skips (ROOT, initial (S. Set to 0 by
+                 default.
+
+    UpperSeq: List.
+               Text that can be matched prior to the verb; this is stored in
+               reverse order. Initialized here as an empty list.
+    Raises
+    ------
+
+    raise_ParseList_error: Function.
+                            Raises if kword < 0, logging a bounds underflow in
+                            get_upper_seq(). Ultimately raises HasParseError.
+
+    Returns
+    -------
+
+    None
     """
     global ParseList, ParseStart
     global UpperSeq
@@ -1680,7 +1778,41 @@ def get_upper_seq(kword):
 def get_lower_seq(kword, endtag):
     """
     Generate the lower sequence starting from kword; lower sequence includes
-    only words in the VP
+    only words in the VP (Verb Phrase).
+
+    Parameters
+    ----------
+
+    kword: Integer.
+            Location in ParseList where the lower sequence generation is
+            started. A loop counts this up in increments of 1.
+
+    endtag: String.
+             Pretty sure this marks the end of the verb phrase. I think it
+             starts with a tilda. # TODO: Figure this out
+
+    Notes
+    -----
+    The following globals get used here:
+
+    ParseList: List.
+                Linearized version of parse tree.
+
+    LowerSeq: List.
+               Text that can be matched following the verb. Initialized here as
+               an empty list.
+
+    Raises
+    ------
+
+    raise_ParseList_error: Function.
+                            Raises if kword >= len(ParseList), logging a bounds
+                            underflow in get_lower_seq(). Ultimately raises
+                            HasParseError.
+    Returns
+    -------
+
+    None
     """
     global ParseList
     global LowerSeq
@@ -1713,6 +1845,16 @@ def make_check_sequences(verbloc, endtag):
     """
     Create the upper and lower sequences to be checked by the verb patterns
     based on the verb at ParseList[verbloc].
+
+    Parameters
+    ----------
+
+    verbloc: Integer.
+              The location of of ther verb in ParseList.
+
+    endtag: String.
+             Pretty sure this marks the end of the verb phrase. I think it
+             starts with a tilda. # TODO: Figure this out
     """
 
     get_upper_seq(verbloc - 1)
@@ -1724,8 +1866,38 @@ def make_multi_sequences(multilist, verbloc, endtag):
     Check if the multi-word list in multilist is valid for the verb at
     ParseList[verbloc], then create the upper and lower sequences to be checked
     by the verb patterns. Lower sequence includes only words in the VP; upper
-    sequence currently terminated by ParseStart, ~S or ~, Returns False if the
-    multilist is not valid, True otherwise.
+    sequence currently terminated by ParseStart, ~S or ~,
+
+    Parameters
+    ----------
+
+    multilist: List.
+                A list of lists, I think with multi word verbs. # TODO: Figure
+                this out
+
+    verbloc: Integer.
+              The location of of ther verb in ParseList.
+
+    endtag: String.
+             Pretty sure this marks the end of the verb phrase. I think it
+             starts with a tilda. # TODO: Figure this out
+
+    Notes
+    -----
+    The following globals get used here:
+
+    ParseList: List.
+                Linearized version of parse tree.
+
+    ParseStart: Integer.
+                 First element to check (skips (ROOT, initial (S. Set to 0 by
+                 default.
+
+    Returns
+    -------
+
+    Boolean.
+     False if the multilist is not valid, True otherwise.
     """
     global ParseList, ParseStart
 
@@ -1761,8 +1933,65 @@ def make_multi_sequences(multilist, verbloc, endtag):
 
 def verb_pattern_match(patlist, aseq, isupperseq):
     """
-    Attempts to match patlist against UpperSeq or LowerSeq; returns True on
-    success.
+    Attempts to match patlist against UpperSeq or LowerSeq.
+
+    Parameters
+    ----------
+
+    patlist: List.
+              List of patterns from the dictionary.
+
+    aseq: List.
+           A sequence in list form. Either UpperSeq or LowerSeq.
+
+
+    isupperseq: Boolean.
+                 Determines whether function uses UperSeq or LowerSeq global.
+                 True if text matched prior to verb.
+
+    Notes
+    -----
+    The following globals get used here:
+
+    SourceLoc: Integer.
+                Location of the source within the Upper/LowerSeq. Set to 0 at
+                run.
+
+    TargetLoc: Integer.
+                Location of the target within the Upper/LowerSeq. Set to 0 at
+                run.
+
+    kpatword: Integer.
+            A counter to set locations in patlist.
+
+    kseq: Integer.
+           A counter of some sort. # TODO: Figure this out
+
+    See Also
+    --------
+
+    find_ne(kseq)
+
+    syn_match(isupperseq)
+
+    last_seqword()
+
+    last_patword()
+
+    no_skip()
+
+    Raises
+    ------
+
+    raise_ParseList_error: Function.
+                            Thrown if there is an overflow error. Ultimately
+                            raises HasParseError.
+
+    Returns
+    -------
+
+    Boolean.
+     True on success.
     """
     # Can set SourceLoc and TargetLoc for $, + and % tokens
     # Still need to handle %
